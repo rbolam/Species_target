@@ -18,7 +18,7 @@ threats$threat_level1[threats$threat_level1 %in% c(4, 6)] <- c("12")
 threat_level1 <- rep(1:12)
 tnames <- c("Residential & commercial\ndevelopment", "Agriculture & aquaculture", "Energy production & mining", 
             "Transportation & service corridors", "Biological resource use", "Human intrusions & disturbance",
-            "Natural system\nmodifications", "Invasive & other\nproblematic species",
+            "Natural system modifications", "Invasive & other\nproblematic species",
             "Pollution", "Geological events", "Climate change &\nsevere weather", "Other")
 tnames <- data.frame(cbind(threat_level1, tnames))
 
@@ -51,7 +51,7 @@ ggplot(threats_summ, aes(axis1 = Aichi.Target, axis2 = tnames, axis3 = Zero.draf
                    "grey90", "grey90", "grey90", "grey90", "grey90")) +
   geom_text(stat = "stratum", infer.label = TRUE, size = 2, min.y = 1000, colour = 
               c("black", "black", "black",
-                "black", "black", "black", "black", "black", "white", "white", "white", "white",
+                "black", "black", "black", "black", "white", "white", "white", "white", "white",
                 "black", "black", "black", "black")) +
   #geom_label(stat = "stratum", infer.label = TRUE, size = 2, min.y = 1000, fill = "white",
   #           label.padding = unit(0.08, "lines"), label.r = unit(0, "lines"), label.size = 0, alpha = 0.6) +
@@ -73,8 +73,8 @@ ggplot(threats_summ, aes(axis1 = Aichi.Target, axis2 = tnames, axis3 = Zero.draf
   annotate("text", x = 1.03, y = 6182, label = "Aichi Target 8", size = 2) +
   annotate("segment", x = 0.95, xend = 0.95, y = 5682, yend = 4016, size = 0.3) +
   
-  annotate("text", x = 3.03, y = 8471, label = "New Target 4", size = 2) +
-  annotate("segment", x = 3.11, xend = 3.11, y = 4471, yend = 7971, size = 0.3) +
+  annotate("text", x = 2.97, y = 8471, label = "New Target 4", size = 2) +
+  annotate("segment", x = 2.89, xend = 2.89, y = 4471, yend = 7971, size = 0.3) +
   
   annotate("rect", xmin = 0.875, xmax = 1.125, ymin = 40279, ymax = 46665, fill = "grey30", colour = "white") +
   annotate("text", x = 1, y = 43472, label = "Not addressed\nby targets", size = 2, colour = "white") +
