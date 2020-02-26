@@ -58,7 +58,7 @@ ggplot(threats_summ, aes(axis1 = Aichi.Target, axis2 = tnames, axis3 = Zero.draf
               c("black", "black", "black",
                 "black", "black", "black", "black", "white", "white", "white", "white", "white",
                 "black", "black", "black", "black")) +
-  scale_x_discrete(limits = c("Aichi Target", "Threat", "Post-2020 Target"), name = "", expand = c(.0005, 0)) + 
+  scale_x_discrete(limits = c("Strategic Plan\n2011-2020", "Threat", "Post-2020\nFramework"), name = "", expand = c(.0005, 0)) + 
   scale_y_continuous(name = "Number of species affected per threat", expand = c(0.0005, 0)) + 
   scale_fill_viridis_d(option = "E", direction = 1) +
   theme_classic() +
