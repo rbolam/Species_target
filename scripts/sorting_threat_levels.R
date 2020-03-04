@@ -1,9 +1,10 @@
+## --------------------------- Make figure of threats ####
+
 library(tidyverse)
-library(viridis)
 
+threats <- read_csv("data/threats.csv")
 
-
-(threats %>% filter(stressName != "") %>% nrow())/nrow(threats)*100
+## -------------------- Sort out threats/stresses data ####
 
 threats <- threats %>% 
   filter(timing %in% c("Future", "Ongoing")) %>% 
@@ -28,7 +29,8 @@ threats %>%
   group_by(code, name, stress) %>% 
   count() ->
   stress
-write_csv(stress, "stresses.csv")
+write_csv(stress, "data/stresses.csv")
+
 
 
 ## -------------------------- Make figure of threats ####
@@ -53,7 +55,8 @@ threats %>%
   geom_bar() +
   coord_flip() +
   labs(x = "Threat level 1", y = "Number of species affected") +
-  scale_fill_brewer(palette = "Dark2", direction = -1, name = "Stress") +
+  #scale_fill_viridis_d(option = "B", direction = 1, name = "Stress") +
+  scale_fill_brewer(palette = "PuBuGn", direction = -1, name = "Stress") +
   theme(legend.position = "bottom")
 ggsave("figures/threats_stresses.png", dpi = 300)
 
