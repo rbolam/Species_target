@@ -1,20 +1,6 @@
 ## --------------------------- Merging all comp groups --------------------------------####
 
-library(rredlist)
 library(tidyverse)
-library(viridis)
-
-## -------------------- Looking at comprehensively assessed groups ####
-
-
-IUCN_REDLIST_KEY <- "f08cfc8b6eb01c715601bb49551d131a4bb762625c61d8d42c970f8d17c61629"
-rl_comp_groups(key = IUCN_REDLIST_KEY)
-
-comp <- rl_comp_groups(key = IUCN_REDLIST_KEY)
-arrange(comp[[2]], group_name)
-
-nrow(rl_comp_groups('hagfishes', key = IUCN_REDLIST_KEY)[[2]])
-
 
 
 ## ------------------------------ Read in files and remove duplicate spp ####
@@ -94,19 +80,3 @@ ggsave("figures/percent_actions_listed.png", dpi = 300)
 
 
 
-## --------------------------- Make figure of actions ####
-
-actions$name[actions$code %in% c("3.1.1", "3.1.2", "3.1.3")] <- c("Species management")
-actions$name[actions$code %in% c("3.3.1", "3.3.2")] <- c("Species re-introduction")
-actions$name[actions$code %in% c("3.4.1", "3.4.2")] <- c("Ex-situ conservation")
-actions$name[actions$code %in% c("5.1.1", "5.1.2", "5.1.3", "5.1.4")] <- c("Legislation")
-actions$name[actions$code %in% c("5.4.1", "5.4.2", "5.4.3", "5.4.4")] <- c("Compliance and enforcement")
-
-actions %>% 
-  select(scientificName, name) %>% 
-  unique() %>% 
-  ggplot(aes(x = fct_rev(fct_infreq(name)))) +
-  geom_bar() +
-  coord_flip() +
-  labs(x = "Actions needed", y = "Number of species needing actions")
-ggsave("figures/actions_needed.png", dpi = 300)
