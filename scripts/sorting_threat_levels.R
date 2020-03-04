@@ -2,7 +2,7 @@
 
 library(tidyverse)
 
-threats <- read_csv("data/threats.csv")
+threats <- read_csv("data/threats.csv") ## this contains threats to species in comprehensively assessed groups
 
 ## -------------------- Sort out threats/stresses data ####
 
@@ -14,9 +14,6 @@ threats <- threats %>%
   select(-s) %>% 
   unique() %>% 
   filter(stress != "")
-
-threats$stress <- as.character(threats$stress)
-
 
 threats$stress[threats$stress %in% c("Hybridisation", "Competition", "Loss of mutualism", "Loss of pollinator", "Inbreeding", 
                                      "Skewed sex ratios", "Reduced reproductive success", "Other")] <- 
