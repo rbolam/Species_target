@@ -5,18 +5,18 @@ library(tidyverse)
 
 ## ------------------------------ Read in files and remove duplicate spp ####
 
-folders <- list.files("rl_download_02_03_2020/") ## make list of files in folder
+folders <- list.files("data/rl_download_02_03_2020/") ## make list of files in folder
 summaries <- data.frame()
 threats <- data.frame()
 actions <- data.frame()
 
 
 for(i in 1:length(folders)) {
-  summ <- read.csv(paste("rl_download_02_03_2020/", folders[i], "/simple_summary.csv", sep = ""))
+  summ <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/simple_summary.csv", sep = ""))
   summaries <- bind_rows(summaries, summ)
-  thr <- read.csv(paste("rl_download_02_03_2020/", folders[i], "/threats.csv", sep = ""))
+  thr <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/threats.csv", sep = ""))
   threats <- bind_rows(threats, thr)
-  act <- read.csv(paste("rl_download_02_03_2020/", folders[i], "/conservation_needed.csv", sep = ""))
+  act <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/conservation_needed.csv", sep = ""))
   actions <- bind_rows(actions, act)
 }
 
