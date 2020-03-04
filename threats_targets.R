@@ -5,8 +5,10 @@ library(tidyverse)
 library(ggalluvial)
 library(viridis)
 
+
+
 ## --------------------------- Sort data --------------------------####
-threats <- read.csv("threats_targets.csv")
+threats <- read.csv("data/threats_targets.csv")
 
 ### Separate threat codes for matching
 threats$code2 <- threats$code
@@ -83,5 +85,5 @@ ggplot(threats_summ, aes(axis1 = Aichi.Target, axis2 = tnames, axis3 = Zero.draf
   annotate("rect", xmin = 2.875, xmax = 3.125, ymin = 42367, ymax = 46665, fill = "grey30", colour = "white") +
   annotate("text", x = 3, y = 44516, label = "Not addressed\nby targets", size = 2, colour = "white")
 
-ggsave("flow.png", width = 7, height = 5, dpi = 600)
+ggsave("figures/flow.png", width = 7, height = 5, dpi = 600)
 
