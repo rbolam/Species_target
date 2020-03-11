@@ -3,7 +3,7 @@
 library(tidyverse)
 
 
-## ------------------------------ Read in files and remove duplicate spp ####
+## ------------------------------ Read in files, remove duplicate spp, and save new files ####
 
 folders <- list.files("data/rl_download_02_03_2020/") ## make list of files in folder
 summaries <- data.frame()
@@ -12,11 +12,11 @@ actions <- data.frame()
 
 
 for(i in 1:length(folders)) {
-  summ <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/simple_summary.csv", sep = ""))
+  summ <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/simple_summary.csv", sep = ""), na.string = c("", "NA"))
   summaries <- bind_rows(summaries, summ)
-  thr <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/threats.csv", sep = ""))
+  thr <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/threats.csv", sep = ""), na.string = c("", "NA"))
   threats <- bind_rows(threats, thr)
-  act <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/conservation_needed.csv", sep = ""))
+  act <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/conservation_needed.csv", sep = ""), na.string = c("", "NA"))
   actions <- bind_rows(actions, act)
 }
 
@@ -38,45 +38,37 @@ actions <- actions %>%
 write_csv(actions, "data/actions_needed.csv")
 
 
-## ---------------------- Figure out if there are patterns in mising data ####
 
-(threats %>% group_by(scientificName) %>% count() %>% nrow())/nrow(summaries)*100 ## % of spp with threats listed
+########## Stresses data
 
-no_threats <- filter(summaries, !scientificName %in% threats$scientificName)
-no_threats %>% count(className) %>% rename(no_thr = n) -> a
-yes_threats <- filter(summaries, scientificName %in% threats$scientificName)
-yes_threats %>% count(className) %>% rename(yes_thr = n) -> b
+stresses <- threats %>% 
+  filter(timing %in% c("Future", "Ongoing")) %>% 
+  select(scientificName, code, name, stressName) %>% 
+  separate(stressName, into = c("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"), sep = "[|]", fill = "right") %>% 
+  gather(4:11, key = s, value = stress, na.rm = T) %>% 
+  select(-s) %>% 
+  unique() %>% 
+  filter(stress != "")
 
-a %>% 
-  left_join(b, by = "className") %>% 
-  mutate(suma = yes_thr + no_thr) %>% 
-  mutate(perc = yes_thr/suma*100) %>% 
-  ggplot(aes(x = fct_reorder(className, perc), y = perc)) +
-  geom_col() +
-  coord_flip() +
-  labs(x = "Class", y = "Percentage of species which have threats listed")
-ggsave("figures/percent_threats_listed.png", dpi = 300)
-## all above 75%
+## Convert level 3 stresses to level 2:
+stresses$stress[stresses$stress %in% c("Hybridisation", "Competition", "Loss of mutualism", "Loss of pollinator", "Inbreeding", 
+                                     "Skewed sex ratios", "Reduced reproductive success", "Other")] <- 
+  c("Indirect species effects")
+
+## Remove 2 spp which have level 1 stress listed:
+stresses <- filter(stresses, !stress %in% c("Ecosystem stresses", "Species Stresses"))
+stresses$stress <- as.factor(stresses$stress)
+stresses$stress <- factor(stresses$stress, levels(stresses$stress)[c(1, 2, 3, 6, 5, 4)])
+
+stresses %>% 
+  group_by(code, name, stress) %>% 
+  count() ->
+  stresses
+write_csv(stresses, "data/stresses.csv")
 
 
 
-(actions %>% group_by(scientificName) %>% count() %>% nrow())/nrow(summaries)*100 ## % of spp with actions listed
 
-no_actions <- filter(summaries, !scientificName %in% actions$scientificName)
-no_actions %>% count(className) %>% rename(no_act = n) -> a
-yes_actions <- filter(summaries, scientificName %in% actions$scientificName)
-yes_actions %>% count(className) %>% rename(yes_act = n) -> b
-
-a %>% 
-  left_join(b, by = "className") %>% 
-  mutate(suma = yes_act + no_act) %>% 
-  mutate(perc = yes_act/suma*100) %>% 
-  ggplot(aes(x = fct_reorder(className, perc), y = perc)) +
-  geom_col() +
-  coord_flip() +
-  labs(x = "Class", y = "Percentage of species which have 'Actions Needed' listed")
-ggsave("figures/percent_actions_listed.png", dpi = 300)
-## all above 50% except for Malacostraca and Gastropoda
 
 
 
