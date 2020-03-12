@@ -1,9 +1,12 @@
-## --------------------------- Merging all comp groups --------------------------------####
+## ------------------------------------------------------------------------------------------------------------####
+## ---------------------------------------------------- Merging data ------------------------------------------####
+## ------------------------------------------------------------------------------------------------------------####
+
 
 library(tidyverse)
 
 
-## ------------------------------ Read in files, remove duplicate spp, and save new files ####
+## ------------------------------ Comprehensively assessed groups - merge -------------------------------------####
 
 folders <- list.files("data/rl_download_02_03_2020/") ## make list of files in folder
 summaries <- data.frame()
@@ -39,7 +42,10 @@ write_csv(actions, "data/actions_needed.csv")
 
 
 
-########## Stresses data
+##---------------------------------- Threats and stresses data --------------------------####
+
+
+## Sort out stresses data ----------------------------------####
 
 stresses <- threats %>% 
   filter(timing %in% c("Future", "Ongoing")) %>% 
@@ -51,24 +57,38 @@ stresses <- threats %>%
   filter(stress != "")
 
 ## Convert level 3 stresses to level 2:
-stresses$stress[stresses$stress %in% c("Hybridisation", "Competition", "Loss of mutualism", "Loss of pollinator", "Inbreeding", 
-                                     "Skewed sex ratios", "Reduced reproductive success", "Other")] <- 
+stresses$stress[stresses$stress %in% c("Hybridisation", "Competition", "Loss of mutualism", "Loss of pollinator", 
+                                       "Inbreeding", "Skewed sex ratios", "Reduced reproductive success", "Other")] <- 
   c("Indirect species effects")
 
-## Remove 2 spp which have level 1 stress listed:
-stresses <- filter(stresses, !stress %in% c("Ecosystem stresses", "Species Stresses"))
-stresses$stress <- as.factor(stresses$stress)
-stresses$stress <- factor(stresses$stress, levels(stresses$stress)[c(1, 2, 3, 6, 5, 4)])
+stresses$stress[stresses$stress %in% c("Ecosystem conversion", "Ecosystem degradation", "Indirect ecosystem effects")] <- 
+  c("Ecosystem stresses")
 
+## Remove 1 spp which has level 1 stress listed:
+stresses <- filter(stresses, stress != "Species Stresses")
+
+
+
+## Sort out threats data ----------------------------------####
+
+stresses <- stresses %>% 
+  separate(col = code, into = c("T1", "T2", "T3"), sep = "[.]") %>% 
+  select(-T3, -name) %>% 
+  unite(thr_lev2, T1:T2, sep = ".")
+
+## Load in key for threat 2 levels and names:
+thr_lev2 <- read.csv("data/threats_level2.csv")
+thr_lev2$thr_lev2 <- as.character(thr_lev2$thr_lev2)
+
+stresses <- left_join(stresses, thr_lev2, by = "thr_lev2")
+
+
+## Count threats/stress and save file ---------------------####
 stresses %>% 
-  group_by(code, name, stress) %>% 
+  group_by(thr_lev2, thr2_name, stress) %>% 
   count() ->
   stresses
+
 write_csv(stresses, "data/stresses.csv")
-
-
-
-
-
 
 
