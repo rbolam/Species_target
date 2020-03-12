@@ -96,12 +96,12 @@ spp %>% filter(is.na(target)) %>% select(scientificName) %>% unique() -> a
 spp %>% filter(scientificName %in% a$scientificName) -> selspp
 
 ## Find spp for which all threats are unaddressed:
-selspp %>% count(scientificName, target) %>% count(scientificName) %>% filter(n == 1) %>% nrow()
+selspp %>% count(scientificName, target) %>% count(scientificName) %>% filter(n == 1) %>% nrow() 
 
-## Retain 
-selspp %>% count(scientificName, target) %>% count(scientificName) #%>% filter(n == 1) #-> b
+## Retain only those spp for which all threats are unaddressed:
+selspp %>% count(scientificName, target) %>% count(scientificName) %>% filter(n == 1) #-> b
 
-spp %>% filter(scientificName %in% b$scientificName) %>% select(scientificName, thr2_name) %>%  unique() %>% 
+spp %>% filter(scientificName %in% b$scientificName) %>% select(scientificName, thr2_name) %>% unique() %>% 
   count(scientificName) %>% count(n)
 
 
