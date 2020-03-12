@@ -82,6 +82,13 @@ thr_lev2$thr_lev2 <- as.character(thr_lev2$thr_lev2)
 
 stresses <- left_join(stresses, thr_lev2, by = "thr_lev2")
 
+## Remove duplicate spp (due to removing lev 3 threats and stresses):
+stresses <- unique(stresses)
+
+
+## Save file with all spp, their threats and stresses:
+write_csv(stresses, "spp_thr_str.csv")
+
 
 ## Count threats/stress and save file ---------------------####
 stresses %>% 
