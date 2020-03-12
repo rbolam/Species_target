@@ -2,31 +2,7 @@
 
 library(tidyverse)
 
-threats <- read_csv("data/threats.csv") ## this contains threats to species in comprehensively assessed groups
-
-## -------------------- Sort out threats/stresses data ####
-
-threats <- threats %>% 
-  filter(timing %in% c("Future", "Ongoing")) %>% 
-  select(scientificName, code, name, stressName) %>% 
-  separate(stressName, into = c("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"), sep = "[|]", fill = "right") %>% 
-  gather(4:11, key = s, value = stress, na.rm = T) %>% 
-  select(-s) %>% 
-  unique() %>% 
-  filter(stress != "")
-
-threats$stress[threats$stress %in% c("Hybridisation", "Competition", "Loss of mutualism", "Loss of pollinator", "Inbreeding", 
-                                     "Skewed sex ratios", "Reduced reproductive success", "Other")] <- 
-  c("Indirect species effects")
-threats <- filter(threats, stress != "Ecosystem stresses")
-threats$stress <- as.factor(threats$stress)
-threats$stress <- factor(threats$stress, levels(threats$stress)[c(1, 2, 3, 6, 5, 4)])
-
-threats %>% 
-  group_by(code, name, stress) %>% 
-  count() ->
-  stress
-write_csv(stress, "data/stresses.csv")
+threats <- read_csv("data/stresses.csv", na = c("", "NA")) ## this contains threats to species in comprehensively assessed groups
 
 
 
