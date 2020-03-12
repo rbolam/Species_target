@@ -8,16 +8,15 @@ library(viridis)
 
 
 ## --------------------------- Sort data --------------------------####
-threats <- read.csv("data/threats_targets.csv")
+threats <- read.csv("data/thr_str_tar_matched.csv")
 
 ### Separate threat codes for matching
-threats$code2 <- threats$code
-threats <- separate(threats, code2, into = c("threat_level1"), extra = "drop") 
+threats <- separate(threats, thr_lev2, into = c("threat_level1"), extra = "drop") 
 
 
-### Add threats 4 and 6 (Transportation & service corridors, Human intrusions & disturbance) to "other" 
-### as there were only 3% and 2% of observations in each one respectively
-threats$threat_level1[threats$threat_level1 %in% c(4, 6)] <- c("12")
+### Add threats 3, 4 and 6 (Energy Production & Mining, Transportation & service corridors, Human intrusions & disturbance) 
+### to "other" as there were less than 5% of observations in each one respectively
+threats$threat_level1[threats$threat_level1 %in% c(3, 4, 6)] <- c("12")
 
 ### Add in threat level 1 names
 threat_level1 <- rep(1:12)
@@ -30,60 +29,39 @@ threats <- left_join(threats, tnames, by = "threat_level1")
 
 ### Count how many threats in each target
 threats %>% 
-  group_by(Aichi.Target, Zero.draft.Action.Target, tnames) %>% 
+  group_by(target, tnames) %>% 
   summarise(n_new = sum(n)) ->
   threats_summ
 
 ### Remove threat Geological events as they cannot be addressed by conservation action/policy
-threats_summ <- filter(threats_summ, tnames != "Geological events")
+#threats_summ <- filter(threats_summ, tnames != "Geological events")
 
 ### Reorder factors depending on size of threat, or numerical order of Target
-threats_summ %>% group_by(tnames) %>% summarise(sum = sum(n_new)) %>% arrange(sum)
-threats_summ$tnames <- factor(threats_summ$tnames, levels(threats_summ$tnames)[c(1, 2, 11, 7, 8, 3, 4, 10, 12, 6, 5, 9)])
-threats_summ$Aichi.Target <- factor(threats_summ$Aichi.Target, levels(threats_summ$Aichi.Target)[c(2, 3, 4, 5, 6, 1)])
+threats_summ %>% group_by(tnames) %>% summarise(sum = sum(n_new)) %>% arrange(-sum)
+threats_summ$tnames <- factor(threats_summ$tnames, levels(threats_summ$tnames)[c(1, 2, 11, 7, 10, 3, 8, 9, 4, 5, 6, 12)])
 
 
 
 ## --------------------------- Code for figure --------------------------####
 
-ggplot(threats_summ, aes(axis1 = Aichi.Target, axis2 = tnames, axis3 = Zero.draft.Action.Target, y = n_new)) +
-  geom_alluvium(aes(fill = tnames), alpha = 0.9, aes.bind = TRUE, width = c(1/4, 1/2, 1/4)) +
-  geom_stratum(size = 0.5, colour = "white", width = 
-                 c(1/4, 1/4, 1/4, 1/4, 1/4, 1/4, 
-                   1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 1/2, 
-                   1/4, 1/4, 1/4, 1/4, 1/4), 
+ggplot(threats_summ, aes(axis1 = tnames, axis2 = target, y = n_new)) +
+  geom_alluvium(aes(fill = tnames), alpha = 0.9, aes.bind = TRUE, width = 1/4) +
+  geom_stratum(size = 0.5, colour = "white", width = 1/4,
                fill = 
-                 c("grey90", "grey90", "grey90", "grey90", "grey90", "grey90", 
-                   NA, NA, NA, NA, NA, NA, NA, NA, NA, 
+                 c(NA, NA, NA, NA, NA, NA, NA, NA,
                    "grey90", "grey90", "grey90", "grey90", "grey90")) +
-  geom_text(stat = "stratum", infer.label = TRUE, size = 2, min.y = 1000, colour = 
-              c("black", "black", "black",
-                "black", "black", "black", "black", "white", "white", "white", "white", "white",
-                "black", "black", "black", "black")) +
-  scale_x_discrete(limits = c("Strategic Plan\n2011-2020", "Threat", "Post-2020\nFramework"), name = "", expand = c(.0005, 0)) + 
+  geom_text(stat = "stratum", infer.label = TRUE, size = 2.4, min.y = 1000, colour = 
+              c("black", "black", "black", "white", "white", "white", "white", "white", 
+                "black", "black", "black", "black", "black")) +
+  scale_x_discrete(limits = c("Threat", "Post-2020\nFramework"), name = "", expand = c(.1, 0)) + 
   scale_y_continuous(name = "Number of species affected per threat", expand = c(0.0005, 0)) + 
   scale_fill_viridis_d(option = "E", direction = 1) +
   theme_classic() +
   theme(legend.position = "none",
         text = element_text(size = 10),
         axis.ticks.x = element_blank()) +
-  annotate("text", x = 0.97, y = 8782, label = "Aichi Target 6", size = 2) +
-  annotate("segment", x = 0.89, xend = 0.89, y = 8282, yend = 4921, size = 0.3) +
-  
-  annotate("text", x = 1, y = 7482, label = "Aichi Target 7", size = 2) +
-  annotate("segment", x = 0.92, xend = 0.92, y = 6982, yend = 4482, size = 0.3) +
-  
-  annotate("text", x = 1.03, y = 6182, label = "Aichi Target 8", size = 2) +
-  annotate("segment", x = 0.95, xend = 0.95, y = 5682, yend = 4016, size = 0.3) +
-  
-  annotate("text", x = 2.97, y = 8471, label = "New Target 4", size = 2) +
-  annotate("segment", x = 2.89, xend = 2.89, y = 4471, yend = 7971, size = 0.3) +
-  
-  annotate("rect", xmin = 0.875, xmax = 1.125, ymin = 40279, ymax = 46665, fill = "grey30", colour = "white") +
-  annotate("text", x = 1, y = 43472, label = "Not addressed\nby targets", size = 2, colour = "white") +
-  
-  annotate("rect", xmin = 2.875, xmax = 3.125, ymin = 42367, ymax = 46665, fill = "grey30", colour = "white") +
-  annotate("text", x = 3, y = 44516, label = "Not addressed\nby targets", size = 2, colour = "white")
+  annotate("rect", xmin = 1.875, xmax = 2.125, ymin = 62888, ymax = 69213, fill = "grey30", colour = "white") +
+  annotate("text", x = 2, y = 66051, label = "Not addressed\nby targets", size = 2.4, colour = "white")
 
 ggsave("figures/flow.png", width = 7, height = 5, dpi = 600)
 
