@@ -82,11 +82,21 @@ spp <- left_join(spp, threats2, by = c("thr_lev2", "stress"))
 
 
 ## Number of species which have at least 1 unaddressed threat:
+
 spp %>% filter(is.na(target)) %>% select(scientificName) %>% unique() %>% nrow()
-spp %>% select(scientificName) %>% unique() %>% nrow()
+spp %>% select(scientificName) %>% unique() %>% nrow() ## this is no of all spp
+
+
 
 ## Number of species for which all threats are unaddressed:
-spp %>% filter(is.na(target)) %>% select(scientificName) %>% unique() -> a
 
+## find all spp with unaddressed threats:
+spp %>% filter(is.na(target)) %>% select(scientificName) %>% unique() -> a 
+
+## Retain only those spp with unaddressed threats:
 spp %>% filter(scientificName %in% a$scientificName) -> selspp
+
+## Find spp for which all threats are unaddressed:
 selspp %>% count(scientificName, target) %>% count(scientificName) %>% filter(n == 1) %>% nrow()
+
+
