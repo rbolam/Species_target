@@ -51,8 +51,8 @@ ggplot(threats_summ, aes(axis1 = tnames, axis2 = target, y = n_new)) +
   geom_stratum(size = 0.5, colour = "white", width = 1/4, fill = 
                  c(NA, NA, NA, NA, NA, NA, NA, NA, 
                    "grey90", "grey90", "grey90", "grey90", "grey90")) +
-  geom_text(stat = "stratum", infer.label = TRUE, size = 2.4, min.y = 1000, colour = 
-              c("black", "black", "black", "white", "white", "white", "white", "white", 
+  geom_text(stat = "stratum", infer.label = TRUE, size = 2.2, fontface = "bold", min.y = 1000, colour = 
+              c("black", "black", "black", "black", "white", "white", "white", "white", 
                 "black", "black", "black", "black", "black")) +
   scale_x_discrete(limits = c("Threat", "Post-2020\nFramework"), name = "", expand = c(.1, 0)) + 
   scale_y_continuous(name = "Number of species affected per threat", expand = c(0.0005, 0)) + 
@@ -62,7 +62,7 @@ ggplot(threats_summ, aes(axis1 = tnames, axis2 = target, y = n_new)) +
         text = element_text(size = 10),
         axis.ticks.x = element_blank()) +
   annotate("rect", xmin = 1.875, xmax = 2.125, ymin = 39106, ymax = 44972, fill = "grey30", colour = "white") +
-  annotate("text", x = 2, y = 42039, label = "Not addressed\nby targets", size = 2.4, colour = "white")
+  annotate("text", x = 2, y = 42039, label = "Not addressed\nby targets", size = 2.2, fontface = "bold", colour = "white")
 
 ggsave("figures/flow.png", width = 7, height = 5, dpi = 600)
 
@@ -77,7 +77,6 @@ spp <- read.csv("spp_thr_str.csv")
 
 threats2 <- select(threats, thr_lev2, stress, target)
 threats2 <- unique(threats2)
-
 spp <- left_join(spp, threats2, by = c("thr_lev2", "stress"))
 
 
@@ -99,4 +98,17 @@ spp %>% filter(scientificName %in% a$scientificName) -> selspp
 ## Find spp for which all threats are unaddressed:
 selspp %>% count(scientificName, target) %>% count(scientificName) %>% filter(n == 1) %>% nrow()
 
+## Retain 
+selspp %>% count(scientificName, target) %>% count(scientificName) #%>% filter(n == 1) #-> b
 
+spp %>% filter(scientificName %in% b$scientificName) %>% select(scientificName, thr2_name) %>%  unique() %>% 
+  count(scientificName) %>% count(n)
+
+
+
+## Spp benefitting from different targets:
+#No:
+spp %>% select(scientificName, target) %>% unique() %>% count(target) %>% arrange(-n)
+
+#%:
+spp %>% select(scientificName, target) %>% unique() %>% count(target) %>% mutate(n = n/9191*100) %>% arrange(-n)
