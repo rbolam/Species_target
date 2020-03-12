@@ -10,12 +10,17 @@ library(viridis)
 ## --------------------------- Sort data --------------------------####
 threats <- read.csv("data/thr_str_tar_matched.csv")
 
+### Remove threat Geological events as they cannot be addressed by conservation action/policy
+threats <- filter(threats, !thr_lev2 %in% c(10.1, 10.2, 10.3))
+
 ### Separate threat codes for matching
-threats <- separate(threats, thr_lev2, into = c("threat_level1"), extra = "drop") 
+threats$thr_lev22 <- threats$thr_lev2
+threats <- separate(threats, thr_lev22, into = c("threat_level1"), extra = "drop") 
 
 
-### Add threats 3, 4 and 6 (Energy Production & Mining, Transportation & service corridors, Human intrusions & disturbance) 
+### Add threats 3, 4 and 6 (Energy Production & Mining, Human intrusions & disturbance) 
 ### to "other" as there were less than 5% of observations in each one respectively
+threats %>% group_by(threat_level1) %>% summarise(n = sum(n)/sum(threats$n)*100) %>% arrange(n)
 threats$threat_level1[threats$threat_level1 %in% c(3, 4, 6)] <- c("12")
 
 ### Add in threat level 1 names
@@ -33,22 +38,18 @@ threats %>%
   summarise(n_new = sum(n)) ->
   threats_summ
 
-### Remove threat Geological events as they cannot be addressed by conservation action/policy
-#threats_summ <- filter(threats_summ, tnames != "Geological events")
 
 ### Reorder factors depending on size of threat, or numerical order of Target
 threats_summ %>% group_by(tnames) %>% summarise(sum = sum(n_new)) %>% arrange(-sum)
-threats_summ$tnames <- factor(threats_summ$tnames, levels(threats_summ$tnames)[c(1, 2, 11, 7, 10, 3, 8, 9, 4, 5, 6, 12)])
-
+threats_summ$tnames <- factor(threats_summ$tnames, levels(threats_summ$tnames)[c(1, 2, 7, 11, 3, 10, 8, 9, 12, 4, 5, 6)])
 
 
 ## --------------------------- Code for figure --------------------------####
 
 ggplot(threats_summ, aes(axis1 = tnames, axis2 = target, y = n_new)) +
   geom_alluvium(aes(fill = tnames), alpha = 0.9, aes.bind = TRUE, width = 1/4) +
-  geom_stratum(size = 0.5, colour = "white", width = 1/4,
-               fill = 
-                 c(NA, NA, NA, NA, NA, NA, NA, NA,
+  geom_stratum(size = 0.5, colour = "white", width = 1/4, fill = 
+                 c(NA, NA, NA, NA, NA, NA, NA, NA, 
                    "grey90", "grey90", "grey90", "grey90", "grey90")) +
   geom_text(stat = "stratum", infer.label = TRUE, size = 2.4, min.y = 1000, colour = 
               c("black", "black", "black", "white", "white", "white", "white", "white", 
@@ -60,8 +61,32 @@ ggplot(threats_summ, aes(axis1 = tnames, axis2 = target, y = n_new)) +
   theme(legend.position = "none",
         text = element_text(size = 10),
         axis.ticks.x = element_blank()) +
-  annotate("rect", xmin = 1.875, xmax = 2.125, ymin = 62888, ymax = 69213, fill = "grey30", colour = "white") +
-  annotate("text", x = 2, y = 66051, label = "Not addressed\nby targets", size = 2.4, colour = "white")
+  annotate("rect", xmin = 1.875, xmax = 2.125, ymin = 39106, ymax = 44972, fill = "grey30", colour = "white") +
+  annotate("text", x = 2, y = 42039, label = "Not addressed\nby targets", size = 2.4, colour = "white")
 
 ggsave("figures/flow.png", width = 7, height = 5, dpi = 600)
 
+
+
+
+## --------------------------- No of spp --------------------------####
+
+spp <- read.csv("spp_thr_str.csv")
+
+## Make df with threats and stresses linked to targets and join
+
+threats2 <- select(threats, thr_lev2, stress, target)
+threats2 <- unique(threats2)
+
+spp <- left_join(spp, threats2, by = c("thr_lev2", "stress"))
+
+
+## Number of species which have at least 1 unaddressed threat:
+spp %>% filter(is.na(target)) %>% select(scientificName) %>% unique() %>% nrow()
+spp %>% select(scientificName) %>% unique() %>% nrow()
+
+## Number of species for which all threats are unaddressed:
+spp %>% filter(is.na(target)) %>% select(scientificName) %>% unique() -> a
+
+spp %>% filter(scientificName %in% a$scientificName) -> selspp
+selspp %>% count(scientificName, target) %>% count(scientificName) %>% filter(n == 1) %>% nrow()
