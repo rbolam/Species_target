@@ -51,3 +51,6 @@ actions %>%
   scale_fill_brewer(palette = "YlOrRd", name = "IUCN Red List\nCategory") +
   labs(x = "Actions needed", y = "Number of species needing actions")
 ggsave("figures/actions_option3.png", dpi = 300)
+
+
+
