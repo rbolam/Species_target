@@ -54,3 +54,24 @@ ggsave("figures/actions_option3.png", dpi = 300)
 
 
 
+## ---------------------------- Add number of spp requiring each action and save -----------------####
+
+actions %>% 
+  select(scientificName, code, name) %>% 
+  separate(col = code, into = c("A1", "A2"), sep = "[.]") %>% 
+  unite(code, A1:A2, sep = ".") ->
+  no_actions
+
+no_actions$name[no_actions$code == 3.1] <- c("Species management")
+no_actions$name[no_actions$code == 3.3] <- c("Species re-introduction")
+no_actions$name[no_actions$code == 3.4] <- c("Ex-situ conservation")
+no_actions$name[no_actions$code == 5.1] <- c("Legislation")
+no_actions$name[no_actions$code == 5.4] <- c("Compliance and enforcement")
+
+no_actions %>% 
+  unique() %>% 
+  group_by(code, name) %>% 
+  count() ->
+  no_actions
+
+write_csv(no_actions, "data/number_of_actions.csv")
