@@ -48,21 +48,28 @@ threats_summ$tnames <- factor(threats_summ$tnames, levels(threats_summ$tnames)[c
 
 ggplot(threats_summ, aes(axis1 = tnames, axis2 = target, y = n_new)) +
   geom_alluvium(aes(fill = tnames), alpha = 0.9, aes.bind = TRUE, width = 1/4) +
-  geom_stratum(size = 0.5, colour = "white", width = 1/4, fill = 
+  geom_stratum(size = 0.5, colour = "grey20", width = 1/4, fill = 
                  c(NA, NA, NA, NA, NA, NA, NA, NA, 
                    "grey90", "grey90", "grey90", "grey90", "grey90")) +
-  geom_text(stat = "stratum", infer.label = TRUE, size = 2.2, fontface = "bold", min.y = 1000, colour = 
-              c("black", "black", "black", "black", "white", "white", "white", "white", 
-                "black", "black", "black", "black", "black")) +
+  geom_text(stat = "stratum", #infer.label = TRUE, 
+            size = 2.2, fontface = "bold", min.y = 1000, 
+            colour = c("grey20", "grey20", "grey20", "grey20", 
+                       "grey90", "grey90", "grey90", "grey90", 
+                "grey20", "grey20", "grey20", "grey20", "grey20"),
+            label = c("Other\n(4,703)", "Natural system modifications\n(2,683)", "Pollution\n(4,219)", 
+                      "Climate change &\nsevere weather\n(4,322)", 
+                      "Residential & commercial\ndevelopment\n(4,879)", "Invasive & other\nproblematic species\n(5,871)", 
+                      "Biological resource use\n(9,011)", "Agriculture, aquaculture\n& forestry\n(9,284)", 
+                      "Target 6\n(4,322)", "Target 5\n(4,206)", "Target 4\n(4,219)", "Target 3\n(3,863)", "Target 1 & 2\n(22,496)")) +
   scale_x_discrete(limits = c("Threat", "Post-2020\nFramework"), name = "", expand = c(.1, 0)) + 
-  scale_y_continuous(name = "Number of species affected per threat", expand = c(0.0005, 0)) + 
+  scale_y_continuous(name = "Number of species", expand = c(0.0005, 0)) + 
   scale_fill_viridis_d(option = "E", direction = 1) +
   theme_classic() +
   theme(legend.position = "none",
         text = element_text(size = 10),
         axis.ticks.x = element_blank()) +
-  annotate("rect", xmin = 1.875, xmax = 2.125, ymin = 39106, ymax = 44972, fill = "grey30", colour = "white") +
-  annotate("text", x = 2, y = 42039, label = "Not addressed\nby targets", size = 2.2, fontface = "bold", colour = "white")
+  annotate("rect", xmin = 1.875, xmax = 2.125, ymin = 39106, ymax = 44972, fill = "grey30", colour = "grey20") +
+  annotate("text", x = 2, y = 42039, label = "Not addressed\nby targets\n(5,866)", size = 2.2, fontface = "bold", colour = "grey90")
 
 ggsave("figures/flow.png", width = 7, height = 5, dpi = 600)
 
