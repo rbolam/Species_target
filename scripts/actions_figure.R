@@ -38,10 +38,13 @@ ggsave("figures/actions_option1.png", height = 10, width = 8, dpi = 300)
 actions %>% 
   select(scientificName, name, className) %>% 
   unique() %>% 
+  filter(className != "GASTROPODA") %>% ## remove the only gastropod in here
   ggplot(aes(x = fct_rev(fct_infreq(name)), fill = className)) +
   geom_bar() +
   coord_flip() +
   scale_fill_viridis_d(option = "D", name = "Class") +
+  scale_y_continuous(expand = c(0.001, 0)) + 
+  theme_classic() +
   labs(x = "Actions needed", y = "Number of species needing actions")
 ggsave("figures/actions_option2.png", dpi = 300)
 
@@ -52,6 +55,8 @@ actions %>%
   geom_bar() +
   coord_flip() +
   scale_fill_brewer(palette = "YlOrRd", name = "IUCN Red List\nCategory") +
+  scale_y_continuous(expand = c(0.001, 0)) + 
+  theme_classic() +
   labs(x = "Actions needed", y = "Number of species needing actions")
 ggsave("figures/actions_option3.png", dpi = 300)
 
