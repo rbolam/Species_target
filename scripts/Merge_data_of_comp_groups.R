@@ -15,14 +15,21 @@ actions <- data.frame()
 
 
 for(i in 1:length(folders)) {
-  summ <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/simple_summary.csv", sep = ""), na.string = c("", "NA"))
+  summ <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/simple_summary.csv", sep = ""), na.string = 
+                     c("", "NA"))
   summaries <- bind_rows(summaries, summ)
   thr <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/threats.csv", sep = ""), na.string = c("", "NA"))
   threats <- bind_rows(threats, thr)
-  act <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/conservation_needed.csv", sep = ""), na.string = c("", "NA"))
+  act <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/conservation_needed.csv", sep = ""), 
+                  na.string = c("", "NA"))
   actions <- bind_rows(actions, act)
 }
 
+
+## Remove some bony fish genera ------------------------####
+
+summaries <- filter(summaries, !genusName %in% c("Hydrophis", "Aipysurus", "Emydocephalus", "Hydrelaps",
+                                                 "Laticauda"))
 
 summaries <- summaries %>% 
   filter(redlistCategory %in% c("Critically Endangered", "Endangered", "Vulnerable", "Near Threatened")) %>% 
@@ -44,6 +51,7 @@ write_csv(actions, "data/actions_needed.csv")
 
 ##---------------------------------- Threats and stresses data --------------------------####
 
+threats <- read.csv("data/threats.csv")
 
 ## Sort out stresses data ----------------------------------####
 
@@ -56,6 +64,11 @@ stresses <- threats %>%
   unique() %>% 
   filter(stress != "")
 
+pva <- stresses %>% 
+  filter(stress %in% c("Hybridisation", "Inbreeding", "Reduced reproductive success", "Skewed sex ratios")) %>% 
+  select(scientificName) %>% 
+  unique()
+
 ## Convert level 3 stresses to level 2:
 stresses$stress[stresses$stress %in% c("Hybridisation", "Competition", "Loss of mutualism", "Loss of pollinator", 
                                        "Inbreeding", "Skewed sex ratios", "Reduced reproductive success", "Other")] <- 
@@ -67,6 +80,23 @@ stresses$stress[stresses$stress %in% c("Ecosystem conversion", "Ecosystem degrad
 ## Remove 1 spp which has level 1 stress listed:
 stresses <- filter(stresses, stress != "Species Stresses")
 
+threats <- read.csv("data/spp_thr_str.csv")
+summaries <- read.csv("data/simple_summaries.csv")
+threats <-  left_join(threats, summaries, by = "scientificName")
+threats2 <- threats %>% 
+  filter(phylumName == "CNIDARIA" & thr_lev2 == "11.3") %>% 
+  select(scientificName) %>% 
+  unique()
+
+
+threats <- read.csv("data/threats.csv")
+summaries <- read.csv("data/simple_summaries.csv")
+threats <-  left_join(threats, summaries, by = "scientificName")
+
+threats2 <- threats %>% 
+  filter(className == "AMPHIBIA" & ias == "Batrachochytrium dendrobatidis") %>% 
+  #select(scientificName) %>% 
+  unique()
 
 
 ## Sort out threats data ----------------------------------####
@@ -87,15 +117,42 @@ stresses <- unique(stresses)
 
 
 ## Save file with all spp, their threats and stresses:
-write_csv(stresses, "spp_thr_str.csv")
+write_csv(stresses, "data/spp_thr_str.csv")
 
 
-## Count threats/stress and save file ---------------------####
+## Count threats/stress, merge with matching, and save file ---------------------####
 stresses %>% 
   group_by(thr_lev2, thr2_name, stress) %>% 
   count() ->
-  stresses
+  stresscount
 
-write_csv(stresses, "data/stresses.csv")
+match <- read.csv("data/thr_str_tar_matched.csv")
+match$thr_lev2 <- as.character(match$thr_lev2)
+
+stresscount <- full_join(stresscount, match, by = c("thr_lev2", "stress", "thr2_name"))
+write_csv(stresscount, "data/stresses.csv")
 
 
+spp <- read.csv("data/spp_thr_str.csv")
+match <- read.csv("data/thr_str_tar_matched.csv")
+
+spp %>% 
+  left_join(match, by = c("thr_lev2", "stress", "thr2_name")) %>% 
+  select(scientificName, target) %>% 
+  unique() %>% 
+  count(target) %>% 
+  mutate(n = n/9750*100)
+
+spp %>% 
+  left_join(match, by = c("thr_lev2", "stress", "thr2_name")) %>% 
+  filter(!is.na(target)) %>% 
+  select(scientificName) %>% 
+  unique() ->
+  spp2
+
+spp %>% 
+  left_join(match, by = c("thr_lev2", "stress", "thr2_name")) %>% 
+  filter(!scientificName %in% spp2$scientificName) %>% 
+  select(scientificName) %>% 
+  unique() %>% 
+  nrow()

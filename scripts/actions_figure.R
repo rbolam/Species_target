@@ -5,7 +5,7 @@ library(lemon)
 
 actions <- read_csv("data/actions_needed.csv")
 summaries <- read_csv("data/simple_summaries.csv")
-summaries <- select(summaries, scientificName, className, redlistCategory)
+summaries <- select(summaries, scientificName, redlistCategory)
 
 actions <- left_join(actions, summaries, by = "scientificName")
 
@@ -17,36 +17,8 @@ actions$name[actions$code %in% c("5.4.1", "5.4.2", "5.4.3", "5.4.4")] <- c("Comp
 
 actions$redlistCategory <- factor(actions$redlistCategory)
 actions$redlistCategory <- factor(actions$redlistCategory, levels(actions$redlistCategory)[c(3, 4, 2, 1)])
-actions$className[actions$className == "HYDROZOA"] <- c("ANTHOZOA")
 
-actions %>% 
-  select(scientificName, name, className, redlistCategory) %>% 
-  unique() %>% 
-  filter(className != "GASTROPODA") %>% ## remove the only gastropod in here
-  ggplot(aes(x = fct_infreq(name), fill = redlistCategory)) +
-  geom_bar() +
-  scale_fill_brewer(palette = "YlOrRd", name = "IUCN Red List\nCategory") +
-  labs(x = "Actions needed", y = "Number of species needing actions") +
-  facet_rep_wrap(~className, ncol = 1, scales = "free_y", strip.position = "right") +
-  scale_y_continuous(expand = c(0.01, 0)) + 
-  theme_classic() +
-  theme(legend.position = "right", 
-        axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5),
-        strip.text.y = element_text(angle = 0))
-ggsave("figures/actions_option1.png", height = 10, width = 8, dpi = 300)
 
-actions %>% 
-  select(scientificName, name, className) %>% 
-  unique() %>% 
-  filter(className != "GASTROPODA") %>% ## remove the only gastropod in here
-  ggplot(aes(x = fct_rev(fct_infreq(name)), fill = className)) +
-  geom_bar() +
-  coord_flip() +
-  scale_fill_viridis_d(option = "D", name = "Class") +
-  scale_y_continuous(expand = c(0.001, 0)) + 
-  theme_classic() +
-  labs(x = "Actions needed", y = "Number of species needing actions")
-ggsave("figures/actions_option2.png", dpi = 300)
 
 actions %>% 
   select(scientificName, name, redlistCategory) %>% 
@@ -57,8 +29,11 @@ actions %>%
   scale_fill_brewer(palette = "YlOrRd", name = "IUCN Red List\nCategory") +
   scale_y_continuous(expand = c(0.001, 0)) + 
   theme_classic() +
-  labs(x = "Actions needed", y = "Number of species needing actions")
-ggsave("figures/actions_option3.png", dpi = 300)
+  guides(fill = guide_legend(reverse = TRUE)) +
+  labs(x = "Actions needed", y = "Number of species") +
+  theme(legend.position = c(0.8, 0.3),
+        text = element_text(size = 7))
+ggsave("figures/actions.png", height = 8, width = 12, dpi = 300, unit = "cm")
 
 
 
