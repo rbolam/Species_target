@@ -1,4 +1,4 @@
-# --------------------------- Making plot linking threats to targets ---------------------------####
+# --------------------------- Making plot linking threats to targets ------------------------####
 
 ### Load packages
 library(tidyverse)
@@ -9,73 +9,74 @@ library(ggalt)
 library(gridExtra)
 
 ## --------------------------- Sort data --------------------------####
-threats <- read.csv("data/stresses.csv")
+threats <- read.csv("data/spp_tar.csv")
 
 ### Remove threat Geological events as they cannot be addressed by conservation action/policy
-threats <- filter(threats, !thr_lev2 %in% c(10.1, 10.2, 10.3))
+threats <- threats %>% 
+  filter(!thr_lev2 %in% c(10.1, 10.2, 10.3)) %>% 
+  select(scientificName, thr_lev1name, target) %>% 
+  unique()
 
-### Separate threat codes for matching
-threats$thr_lev22 <- threats$thr_lev2
-threats <- separate(threats, thr_lev22, into = c("threat_level1"), extra = "drop") 
 
+### Add threats Transportation & service corridors,Energy Production & Mining, 
+### Human intrusions & disturbance, to "other" as less than 5% of observations in each:
+threats %>% count(thr_lev1name) %>% mutate(perc = n/sum(n)*100) %>% arrange(-perc)
 
-### Add threats 3, 4 and 6 (Energy Production & Mining, Human intrusions & disturbance) 
-### to "other" as there were less than 5% of observations in each one respectively
-threats %>% group_by(threat_level1) %>% summarise(n = sum(n)/sum(threats$n)*100) %>% arrange(n)
-threats$threat_level1[threats$threat_level1 %in% c(3, 4, 6)] <- c("12")
-
-### Add in threat level 1 names
-threat_level1 <- rep(1:12)
-tnames <- c("Residential & commercial\ndevelopment", "Agriculture & aquaculture", "Energy production & mining", 
-            "Transportation & service corridors", "Biological resource use", "Human intrusions & disturbance",
-            "Natural system modifications", "Invasive & other\nproblematic species",
-            "Pollution", "Geological events", "Climate change &\nsevere weather", "Other")
-tnames <- data.frame(cbind(threat_level1, tnames))
-threats <- left_join(threats, tnames, by = "threat_level1")
+threats$thr_lev1name[threats$thr_lev1name %in% c("Transportation & service corridors", 
+                                                 "Energy production & mining", 
+                                                 "Human intrusions & disturbance")] <- 
+  c("Other")
 
 ### Count how many threats in each target
 threats %>% 
-  group_by(target, tnames) %>% 
-  summarise(n_new = sum(n)) ->
+  group_by(target, thr_lev1name) %>% 
+  count() ->
   threats_summ
 
 
 ### Reorder factors depending on size of threat, or numerical order of Target
-threats_summ %>% group_by(tnames) %>% summarise(sum = sum(n_new)) %>% arrange(-sum)
-levels(threats_summ$tnames)
-threats_summ$tnames <- factor(threats_summ$tnames, levels(threats_summ$tnames)[c(2, 1, 7, 11, 3, 10, 8, 9, 12, 4, 5, 6)])
+threats_summ %>% group_by(thr_lev1name) %>% summarise(sum = sum(n)) %>% arrange(-sum)
+threats_summ$thr_lev1name <- factor(threats_summ$thr_lev1name)
+levels(threats_summ$thr_lev1name)
+threats_summ$thr_lev1name <- factor(threats_summ$thr_lev1name, levels(threats_summ$thr_lev1name)[c(2, 1, 8, 4, 5, 7, 3, 6)])
 
 
 ## --------------------------- Code for figure 1 --------------------------####
 
-ggplot(threats_summ, aes(axis1 = tnames, axis2 = target, y = n_new)) +
-  geom_alluvium(aes(fill = tnames), alpha = 0.9, aes.bind = TRUE, width = 1/4) +
+ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
+  geom_alluvium(aes(fill = thr_lev1name), alpha = 0.9, aes.bind = TRUE, width = 1/4) +
   geom_stratum(size = 0.5, colour = "grey20", width = 1/4, fill = 
                  c(NA, NA, NA, NA, NA, NA, NA, NA, 
-                   "grey90", "grey90", "grey90", "grey90", "grey90")) +
-  geom_text(stat = "stratum", #infer.label = TRUE, 
+                   "grey90", "grey90", "grey90", "grey90", "grey90", "grey90")) +
+  geom_text(stat = "stratum", infer.label = TRUE, 
             size = 1.3, fontface = "bold", min.y = 1000, 
             colour = c("grey20", "grey20", "grey20", "grey20", 
-                       "grey90", "grey90", "grey90", "grey90", 
-                "grey20", "grey20", "grey20", "grey20", "grey20"),
-            label = c("Other\n(4,705)", "Natural system modifications\n(2,683)", "Pollution\n(4,221)", 
-                      "Climate change & severe\nweather (4,318)", "Residential & commercial\ndevelopment\n(4,869)", 
-                      "Invasive & other\nproblematic species\n(5,873)", 
-                      "Agriculture & aquaculture\n(9,284)", "Biological resource use\n(13,815)", 
-                      "Target 6 - Climate change\n(4,318)", "Target 5 - Harvesting & trade\n(9,009)", 
-                      "Target 4 - Pollution\n(4,221)", "Target 3 - Invasive species\n(3,864)", 
-                      "Target 1 & 2 - Ecosystems\n& protected areas\n(22,488)")) +
+                       "grey90", "grey90", "grey90", "grey90",
+                       "grey20", "grey20", "grey20", "grey20", "grey20", "grey20"),
+            label = c("Other\n(3,119)", 
+                      "Climate change & severe\nweather (1,320)",
+                      "Pollution\n(1,460)", 
+                      "Natural system modifications\n(1,837)", 
+                      "Invasive & other\nproblematic species\n(2,407)", 
+                      "Residential & commercial\ndevelopment\n(2,492)", 
+                      "Agriculture & aquaculture\n(4,882)", 
+                      "Biological resource use\n(7,948)", 
+                      "Target 6 - Climate change\n(4,318)", 
+                      "Target 5 - Harvesting & trade\n(9,009)", 
+                      "Target 4 - Pollution\n(4,221)", 
+                      "Target 3 - Invasive species\n(3,864)", 
+                      "Target 1 & 2 - Ecosystems\n& protected areas\n(13,506)", "")) +
   scale_x_discrete(limits = c("Threat", "Post-2020\nFramework"), name = "", expand = c(.001, 0)) + 
   scale_y_continuous(name = "Number of species", expand = c(0.001, 0)) + 
   scale_fill_viridis_d(option = "E", direction = 1) +
   theme_classic() +
   theme(legend.position = "none",
         text = element_text(size = 7),
-        axis.ticks.x = element_blank()) +
-  annotate("rect", xmin = 1.875, xmax = 2.125, ymin = 43900, ymax = 49768, fill = "grey30", colour = "grey20") +
-  annotate("text", x = 2, y = 46834, label = "Not addressed\nby targets\n(5,868)", size = 1.3, fontface = "bold", 
-           colour = "grey90") ->
-  a
+        axis.ticks.x = element_blank()) #+
+ # annotate("rect", xmin = 1.875, xmax = 2.125, ymin = 43900, ymax = 49768, fill = "grey30", colour = "grey20") +
+  #annotate("text", x = 2, y = 46834, label = "Not addressed\nby targets\n(5,868)", size = 1.3, fontface = "bold", 
+   #        colour = "grey90") #->
+  #a
 
 ggsave("figures/flow_option1.png", width = 7, height = 5, dpi = 600)
 
