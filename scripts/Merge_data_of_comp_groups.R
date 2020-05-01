@@ -1,12 +1,12 @@
-## ------------------------------------------------------------------------------------------------------------####
-## ---------------------------------------------------- Merging data ------------------------------------------####
-## ------------------------------------------------------------------------------------------------------------####
+## ------------------------------------------------------------------------------------####
+## ---------------------------- Merging data ------------------------------------------####
+## ------------------------------------------------------------------------------------####
 
 
 library(tidyverse)
 
 
-## ------------------------------ Comprehensively assessed groups - merge -------------------------------------####
+## ----------------- Comprehensively assessed groups - merge --------------------------####
 
 folders <- list.files("data/rl_download_02_03_2020/") ## make list of files in folder
 summaries <- data.frame()
@@ -15,24 +15,33 @@ actions <- data.frame()
 
 
 for(i in 1:length(folders)) {
-  summ <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/simple_summary.csv", sep = ""), na.string = 
-                     c("", "NA"))
+  # Make df called summaries of all RL aummary files:
+  summ <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/simple_summary.csv", 
+                         sep = ""), na.string = c("", "NA"))
   summaries <- bind_rows(summaries, summ)
-  thr <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/threats.csv", sep = ""), na.string = c("", "NA"))
+  
+  # Make df called threats of all RL threat files:
+  thr <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/threats.csv", 
+                        sep = ""), na.string = c("", "NA"))
   threats <- bind_rows(threats, thr)
-  act <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/conservation_needed.csv", sep = ""), 
-                  na.string = c("", "NA"))
+  
+  # Make df called actions of all RL action files:
+  act <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/conservation_needed.csv", 
+                        sep = ""), na.string = c("", "NA"))
   actions <- bind_rows(actions, act)
 }
 
 
 ## Remove some bony fish genera ------------------------####
 
-summaries <- filter(summaries, !genusName %in% c("Hydrophis", "Aipysurus", "Emydocephalus", "Hydrelaps",
-                                                 "Laticauda"))
+summaries <- filter(summaries, !genusName %in% c("Hydrophis", "Aipysurus", "Emydocephalus", 
+                                                 "Hydrelaps", "Laticauda"))
 
+
+## Retain releveant RL categories and save files -----####
 summaries <- summaries %>% 
-  filter(redlistCategory %in% c("Critically Endangered", "Endangered", "Vulnerable", "Near Threatened")) %>% 
+  filter(redlistCategory %in% c("Extinct in the Wild", "Critically Endangered", "Endangered", 
+                                "Vulnerable")) %>% 
   unique()
 write_csv(summaries, "data/simple_summaries.csv")
 
