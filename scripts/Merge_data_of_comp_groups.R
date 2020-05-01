@@ -67,45 +67,52 @@ threats <- read.csv("data/threats.csv")
 stresses <- threats %>% 
   filter(timing %in% c("Future", "Ongoing")) %>% 
   select(scientificName, code, name, stressName) %>% 
-  separate(stressName, into = c("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"), sep = "[|]", fill = "right") %>% 
+  
+  # Turn col stressName into 8 cols, so each one is in a separate col:
+  separate(stressName, into = c("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"), sep = "[|]", 
+           fill = "right") %>% 
+  
+  # Make 2 cols so each stress is listed in col stress:
   gather(4:11, key = s, value = stress, na.rm = T) %>% 
   select(-s) %>% 
   unique() %>% 
   filter(stress != "")
 
-pva <- stresses %>% 
-  filter(stress %in% c("Hybridisation", "Inbreeding", "Reduced reproductive success", "Skewed sex ratios")) %>% 
-  select(scientificName) %>% 
-  unique()
 
 ## Convert level 3 stresses to level 2:
-stresses$stress[stresses$stress %in% c("Hybridisation", "Competition", "Loss of mutualism", "Loss of pollinator", 
-                                       "Inbreeding", "Skewed sex ratios", "Reduced reproductive success", "Other")] <- 
+stresses$stress[stresses$stress %in% c("Hybridisation", "Competition", "Loss of mutualism", 
+                                       "Loss of pollinator", "Inbreeding", "Skewed sex ratios", 
+                                       "Reduced reproductive success", "Other")] <- 
   c("Indirect species effects")
 
-stresses$stress[stresses$stress %in% c("Ecosystem conversion", "Ecosystem degradation", "Indirect ecosystem effects")] <- 
-  c("Ecosystem stresses")
 
-## Remove 1 spp which has level 1 stress listed:
+stresses$stress[stresses$stress %in% c("Ecosystem conversion", "Ecosystem degradation", 
+                                       "Indirect ecosystem effects")] <- c("Ecosystem stresses")
+
+
+## Remove 1 spp which has only level 1 stress listed:
 stresses <- filter(stresses, stress != "Species Stresses")
 
-threats <- read.csv("data/spp_thr_str.csv")
+
+## Count corals threatened by temperature extremes:
+thr_str <- read.csv("data/spp_thr_str.csv")
 summaries <- read.csv("data/simple_summaries.csv")
-threats <-  left_join(threats, summaries, by = "scientificName")
-threats2 <- threats %>% 
+thr_str %>%  
+  left_join(summaries, by = "scientificName") %>% 
   filter(phylumName == "CNIDARIA" & thr_lev2 == "11.3") %>% 
   select(scientificName) %>% 
-  unique()
+  unique() %>% 
+  nrow()
 
 
+## Count amphibians threatened by chytrid disease:
 threats <- read.csv("data/threats.csv")
-summaries <- read.csv("data/simple_summaries.csv")
-threats <-  left_join(threats, summaries, by = "scientificName")
-
-threats2 <- threats %>% 
+threats %>% 
+  left_join(summaries, by = "scientificName") %>% 
   filter(className == "AMPHIBIA" & ias == "Batrachochytrium dendrobatidis") %>% 
-  #select(scientificName) %>% 
-  unique()
+  select(scientificName) %>% 
+  unique() %>% 
+  nrow()
 
 
 ## Sort out threats data ----------------------------------####
