@@ -110,25 +110,19 @@ thr_lev$thr_lev2 <- as.character(thr_lev$thr_lev2)
 
 stresses <- left_join(stresses, thr_lev, by = "thr_lev2")
 
+
 ## Remove duplicate spp (due to removing lev 3 threats and stresses):
 stresses <- unique(stresses)
 
 
-## Save file with all spp, their threats and stresses:
-write_csv(stresses, "data/spp_thr_str.csv")
-
-
-## Count threats/stress, merge with matching, and save file ---------------------####
-stresses %>% 
-  group_by(thr_lev2, thr2_name, stress) %>% 
-  count() ->
-  stresscount
-
+## Merge spp with target matching, and save file
 match <- read.csv("data/thr_str_tar_matched.csv")
 match$thr_lev2 <- as.character(match$thr_lev2)
 
-stresscount <- full_join(stresscount, match, by = c("thr_lev2", "stress", "thr2_name"))
-write_csv(stresscount, "data/stresses.csv")
+stresses <- left_join(stresses, match, by = c("thr_lev2", "stress", "thr_lev2name"))
+write_csv(stresses, "data/spp_tar.csv")
+
+#####################################################
 
 
 spp <- read.csv("data/spp_thr_str.csv")
