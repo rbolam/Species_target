@@ -16,7 +16,7 @@ actions$name[actions$code %in% c("5.1.1", "5.1.2", "5.1.3", "5.1.4")] <- c("Legi
 actions$name[actions$code %in% c("5.4.1", "5.4.2", "5.4.3", "5.4.4")] <- c("Compliance and enforcement")
 
 actions$redlistCategory <- factor(actions$redlistCategory)
-actions$redlistCategory <- factor(actions$redlistCategory, levels(actions$redlistCategory)[c(3, 4, 2, 1)])
+actions$redlistCategory <- factor(actions$redlistCategory, levels(actions$redlistCategory)[c(4, 2, 1, 3)])
 
 
 
@@ -26,7 +26,8 @@ actions %>%
   ggplot(aes(x = fct_rev(fct_infreq(name)), fill = redlistCategory)) +
   geom_bar() +
   coord_flip() +
-  scale_fill_brewer(palette = "YlOrRd", name = "IUCN Red List\nCategory") +
+  scale_fill_manual(values = c("#fecc5c", "#fd8d3c", "#f03b20", "#bd0026"), 
+                    name = "IUCN Red List\nCategory") +
   scale_y_continuous(expand = c(0.001, 0)) + 
   theme_classic() +
   guides(fill = guide_legend(reverse = TRUE)) +
