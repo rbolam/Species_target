@@ -94,39 +94,21 @@ stresses$stress[stresses$stress %in% c("Ecosystem conversion", "Ecosystem degrad
 stresses <- filter(stresses, stress != "Species Stresses")
 
 
-## Count corals threatened by temperature extremes:
-thr_str <- read.csv("data/spp_thr_str.csv")
-summaries <- read.csv("data/simple_summaries.csv")
-thr_str %>%  
-  left_join(summaries, by = "scientificName") %>% 
-  filter(phylumName == "CNIDARIA" & thr_lev2 == "11.3") %>% 
-  select(scientificName) %>% 
-  unique() %>% 
-  nrow()
-
-
-## Count amphibians threatened by chytrid disease:
-threats <- read.csv("data/threats.csv")
-threats %>% 
-  left_join(summaries, by = "scientificName") %>% 
-  filter(className == "AMPHIBIA" & ias == "Batrachochytrium dendrobatidis") %>% 
-  select(scientificName) %>% 
-  unique() %>% 
-  nrow()
-
 
 ## Sort out threats data ----------------------------------####
 
 stresses <- stresses %>% 
+  # Remove level 3 threats and turn into level 2:
   separate(col = code, into = c("T1", "T2", "T3"), sep = "[.]") %>% 
   select(-T3, -name) %>% 
   unite(thr_lev2, T1:T2, sep = ".")
 
-## Load in key for threat 2 levels and names:
-thr_lev2 <- read.csv("data/threats_level2.csv")
-thr_lev2$thr_lev2 <- as.character(thr_lev2$thr_lev2)
 
-stresses <- left_join(stresses, thr_lev2, by = "thr_lev2")
+## Load in key for threat levels and names:
+thr_lev <- read.csv("data/threat_levels.csv")
+thr_lev$thr_lev2 <- as.character(thr_lev$thr_lev2)
+
+stresses <- left_join(stresses, thr_lev, by = "thr_lev2")
 
 ## Remove duplicate spp (due to removing lev 3 threats and stresses):
 stresses <- unique(stresses)
