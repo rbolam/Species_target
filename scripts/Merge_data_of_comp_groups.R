@@ -49,10 +49,9 @@ comp2 <- filter(comp, !is.na(tax2))
 summ <- read.csv("data/rl_download_12_05_2020/all_other_spp/simple_summary.csv", 
                  na.string = c("", "NA"))
 
-spp <- select(summ, scientificName, orderName, className, familyName, genusName)
 
 ## Retain those spp in first tax level:
-spp <- filter(spp, orderName %in% ord$group1 | className %in% cla$group1 | 
+spp <- filter(summ, orderName %in% ord$group1 | className %in% cla$group1 | 
                 familyName %in% fam$group1 | genusName %in% gen$group1)
 spp1 <- filter(spp, ! familyName %in% comp2$group1)
 
@@ -66,7 +65,7 @@ spp <- bind_rows(spp1, spp2)
 
 ## Count classes for checking of taxonomies
 a <- count(summaries, className)
-write_csv(a, "data/count_tax.csv") ##pretty consistent!!
+#write_csv(a, "data/count_tax.csv") ##pretty consistent!!
 
 
 ## Merge summaries/ threats and actions for all: -------------------------####
@@ -89,23 +88,23 @@ actions <- bind_rows(actions, act)
 
 
 
-## Retain releveant RL categories and save files ---------------------------####
-summaries <- summaries %>% 
+## Retain relevant RL categories and save files ---------------------------####
+summariesf <- summaries %>% 
   filter(redlistCategory %in% c("Extinct in the Wild", "Critically Endangered", "Endangered", 
                                 "Vulnerable")) %>% 
   unique()
-write_csv(summaries, "data/simple_summaries.csv")
+write_csv(summariesf, "data/simple_summaries.csv")
 
-threats <- threats %>% 
+threatsf <- threats %>% 
   filter(scientificName %in% summaries$scientificName) %>% 
   unique()
-write_csv(threats, "data/threats.csv")
+write_csv(threatsf, "data/threats.csv")
 
 
-actions <- actions %>% 
+actionsf <- actions %>% 
   filter(scientificName %in% summaries$scientificName) %>% 
   unique()
-write_csv(actions, "data/actions_needed.csv")
+write_csv(actionsf, "data/actions_needed.csv")
 
 
 
