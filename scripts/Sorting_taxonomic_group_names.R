@@ -16,4 +16,4 @@ for (i in 2:5) {
   comp[,i] <-str_squish(comp[,i])
 }
 
-write.csv(comp, "comprehensive_groups.csv")
+write_csv(comp, "data/comprehensive_groups.csv")
