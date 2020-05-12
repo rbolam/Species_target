@@ -116,7 +116,8 @@ threats <- read.csv("data/threats.csv")
 
 stresses <- threats %>% 
   filter(timing %in% c("Future", "Ongoing")) %>% 
-  select(scientificName, code, name, stressName) %>% 
+  select(scientificName, code, name, stressName) %>%
+  ##separate_rows(stressName, sep = "[|]") #too slow
   
   # Turn col stressName into 8 cols, so each one is in a separate col:
   separate(stressName, into = c("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"), sep = "[|]", 
@@ -174,16 +175,17 @@ write_csv(stresses, "data/spp_tar.csv")
 
 #####################################################
 
+n_spp <- 
+  read.csv("data/simple_summaries.csv") %>% 
+  nrow()
 
-spp <- read.csv("data/spp_thr_str.csv")
-match <- read.csv("data/thr_str_tar_matched.csv")
+spp <- read.csv("data/spp_tar.csv")
 
 spp %>% 
-  left_join(match, by = c("thr_lev2", "stress", "thr2_name")) %>% 
   select(scientificName, target) %>% 
   unique() %>% 
-  count(target) %>% 
-  mutate(n = n/9750*100)
+  count(target)# %>% 
+  mutate(n = n / n_spp * 100)
 
 spp %>% 
   left_join(match, by = c("thr_lev2", "stress", "thr2_name")) %>% 
