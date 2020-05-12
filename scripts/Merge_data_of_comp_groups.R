@@ -8,37 +8,88 @@ library(tidyverse)
 
 ## ----------------- Comprehensively assessed groups - merge --------------------------####
 
-folders <- list.files("data/rl_download_02_03_2020/") ## make list of files in folder
+folders <- list.files("data/rl_download_12_05_2020/") ## make list of files in folder
+folders <- folders[2:4] # remove all other spp folder
 summaries <- data.frame()
 threats <- data.frame()
 actions <- data.frame()
 
-
+## ------------------- Load birds, corals and fw shrimp:-----------------------####
 for(i in 1:length(folders)) {
   # Make df called summaries of all RL aummary files:
-  summ <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/simple_summary.csv", 
+  summ <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/simple_summary.csv", 
                          sep = ""), na.string = c("", "NA"))
   summaries <- bind_rows(summaries, summ)
   
   # Make df called threats of all RL threat files:
-  thr <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/threats.csv", 
+  thr <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/threats.csv", 
                         sep = ""), na.string = c("", "NA"))
   threats <- bind_rows(threats, thr)
   
   # Make df called actions of all RL action files:
-  act <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/conservation_needed.csv", 
+  act <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/conservation_needed.csv", 
                         sep = ""), na.string = c("", "NA"))
   actions <- bind_rows(actions, act)
 }
 
 
-## Remove some bony fish genera ------------------------####
+## --------------- Load all other spp: --------------------------------------####
+comp <- read.csv("data/comprehensive_groups.csv")
 
-summaries <- filter(summaries, !genusName %in% c("Hydrophis", "Aipysurus", "Emydocephalus", 
-                                                 "Hydrelaps", "Laticauda"))
+## Sep files for sep tax hierarchies:
+ord <- filter(comp, tax1 == "Order")
+cla <- filter(comp, tax1 == "Class")
+fam <- filter(comp, tax1 %in% c("Family", "Families"))
+gen <- filter(comp, tax1 == "Genus")
+
+## Deal sep with tax groups where we need 2 levels:
+comp2 <- filter(comp, !is.na(tax2))
+
+## load in summary data:
+summ <- read.csv("data/rl_download_12_05_2020/all_other_spp/simple_summary.csv", 
+                 na.string = c("", "NA"))
+
+spp <- select(summ, scientificName, orderName, className, familyName, genusName)
+
+## Retain those spp in first tax level:
+spp <- filter(spp, orderName %in% ord$group1 | className %in% cla$group1 | 
+                familyName %in% fam$group1 | genusName %in% gen$group1)
+spp1 <- filter(spp, ! familyName %in% comp2$group1)
+
+## Retain those spp in second tax level:
+spp2 <- filter(spp, familyName %in% comp2$group1 & genusName %in% comp2$group2)
+
+## Merge:
+spp <- bind_rows(spp1, spp2)
 
 
-## Retain releveant RL categories and save files -----####
+
+## Count classes for checking of taxonomies
+a <- count(summaries, className)
+write_csv(a, "data/count_tax.csv") ##pretty consistent!!
+
+
+## Merge summaries/ threats and actions for all: -------------------------####
+
+summaries <- bind_rows(summaries, spp)
+
+## Threat data:
+thr <- read.csv("data/rl_download_12_05_2020/all_other_spp/threats.csv", 
+                      na.string = c("", "NA"))
+thr <- filter(thr, scientificName %in% spp$scientificName)
+threats <- bind_rows(threats, thr)
+
+
+act <- read.csv("data/rl_download_12_05_2020/all_other_spp/conservation_needed.csv", 
+                     na.string = c("", "NA"))
+act <- filter(act, scientificName %in% spp$scientificName)
+actions <- bind_rows(actions, act)
+
+
+
+
+
+## Retain releveant RL categories and save files ---------------------------####
 summaries <- summaries %>% 
   filter(redlistCategory %in% c("Extinct in the Wild", "Critically Endangered", "Endangered", 
                                 "Vulnerable")) %>% 
