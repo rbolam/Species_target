@@ -137,32 +137,20 @@ threats <- read.csv("data/threats.csv")
 stresses <- threats %>% 
   filter(timing %in% c("Future", "Ongoing")) %>% 
   select(scientificName, code, name, stressName) %>%
-  ##separate_rows(stressName, sep = "[|]") #too slow
-  
-  # Turn col stressName into 8 cols, so each one is in a separate col:
-  separate(stressName, into = c("s1", "s2", "s3", "s4", "s5", "s6", "s7", "s8"), sep = "[|]", 
-           fill = "right") %>% 
-  
-  # Make 2 cols so each stress is listed in col stress:
-  gather(4:11, key = s, value = stress, na.rm = T) %>% 
-  select(-s) %>% 
-  unique() %>% 
-  filter(stress != "")
+  separate_rows(stressName, sep = "[|]") %>% 
+  filter(!is.na(stressName))
 
 
 ## Convert level 3 stresses to level 2:
-stresses$stress[stresses$stress %in% c("Hybridisation", "Competition", "Loss of mutualism", 
-                                       "Loss of pollinator", "Inbreeding", "Skewed sex ratios", 
-                                       "Reduced reproductive success", "Other")] <- 
+stresses$stressName[stresses$stressName %in% c("Hybridisation", "Competition", 
+                                               "Loss of mutualism", "Loss of pollinator", 
+                                               "Inbreeding", "Skewed sex ratios", 
+                                               "Reduced reproductive success", "Other")] <- 
   c("Indirect species effects")
 
 
-stresses$stress[stresses$stress %in% c("Ecosystem conversion", "Ecosystem degradation", 
+stresses$stressName[stresses$stressName %in% c("Ecosystem conversion", "Ecosystem degradation", 
                                        "Indirect ecosystem effects")] <- c("Ecosystem stresses")
-
-
-## Remove 1 spp which has only level 1 stress listed:
-stresses <- filter(stresses, stress != "Species Stresses")
 
 
 
@@ -190,8 +178,10 @@ stresses <- unique(stresses)
 match <- read.csv("data/thr_str_tar_matched.csv")
 match$thr_lev2 <- as.character(match$thr_lev2)
 
-stresses <- left_join(stresses, match, by = c("thr_lev2", "stress", "thr_lev2name"))
+stresses <- left_join(stresses, match, by = c("thr_lev2", "stressName", "thr_lev2name"))
 write_csv(stresses, "data/spp_tar.csv")
+
+
 
 #####################################################
 
