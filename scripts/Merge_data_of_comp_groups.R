@@ -109,19 +109,19 @@ summariesf <- summaries %>%
 write_csv(summariesf, "data/simple_summaries.csv")
 
 threatsf <- threats %>% 
-  filter(scientificName %in% summaries$scientificName) %>% 
+  filter(scientificName %in% summariesf$scientificName) %>% 
   unique()
 write_csv(threatsf, "data/threats.csv")
 
 
 actionsf <- actions %>% 
-  filter(scientificName %in% summaries$scientificName) %>% 
+  filter(scientificName %in% summariesf$scientificName) %>% 
   unique()
 write_csv(actionsf, "data/actions_needed.csv")
 
 
 allotherf <- allother %>% 
-  filter(scientificName %in% summaries$scientificName) %>% 
+  filter(scientificName %in% summariesf$scientificName) %>% 
   select(scientificName, PopulationSize.range) %>% 
   unique()
 write_csv(allotherf, "data/all_other_fields.csv")
