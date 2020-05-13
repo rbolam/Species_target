@@ -100,7 +100,13 @@ allo <- read.csv("data/rl_download_12_05_2020/all_other_spp/all_other_fields.csv
 allother <- bind_rows(allother, allo)
 
 
+## Calculate total number of relevant species:
+summaries %>% filter(redlistCategory != "Extinct") %>% nrow() + 8427
+## Number doesn't include 8427 LC birds as they weren't downloaded
+## Once LC birds included: total is 36602
 
+  
+  
 ## Retain relevant RL categories and save files ---------------------------####
 summariesf <- summaries %>% 
   filter(redlistCategory %in% c("Extinct in the Wild", "Critically Endangered", "Endangered", 
