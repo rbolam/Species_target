@@ -13,6 +13,7 @@ folders <- folders[2:4] # remove all other spp folder
 summaries <- data.frame()
 threats <- data.frame()
 actions <- data.frame()
+allother <- data.frame()
 
 ## ------------------- Load birds, corals and fw shrimp:-----------------------####
 for(i in 1:length(folders)) {
@@ -30,6 +31,13 @@ for(i in 1:length(folders)) {
   act <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/conservation_needed.csv", 
                         sep = ""), na.string = c("", "NA"))
   actions <- bind_rows(actions, act)
+  
+  # Make df called allother of all all_other_fields files:
+  allo <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/all_other_fields.csv", 
+                        sep = ""), na.string = c("", "NA"))
+  allo$GenerationLength.range <- as.character(allo$GenerationLength.range)
+  allo$LocationsNumber.range <- as.character(allo$LocationsNumber.range)
+  allother <- bind_rows(allother, allo)
 }
 
 
