@@ -87,12 +87,17 @@ thr <- filter(thr, scientificName %in% spp$scientificName)
 threats <- bind_rows(threats, thr)
 
 
+## Action data:
 act <- read.csv("data/rl_download_12_05_2020/all_other_spp/conservation_needed.csv", 
                      na.string = c("", "NA"))
 act <- filter(act, scientificName %in% spp$scientificName)
 actions <- bind_rows(actions, act)
 
 
+# all_other_fields data:
+allo <- read.csv("data/rl_download_12_05_2020/all_other_spp/all_other_fields.csv", 
+                 na.string = c("", "NA"))
+allother <- bind_rows(allother, allo)
 
 
 
@@ -113,6 +118,13 @@ actionsf <- actions %>%
   filter(scientificName %in% summaries$scientificName) %>% 
   unique()
 write_csv(actionsf, "data/actions_needed.csv")
+
+
+allotherf <- allother %>% 
+  filter(scientificName %in% summaries$scientificName) %>% 
+  select(scientificName, PopulationSize.range) %>% 
+  unique()
+write_csv(allotherf, "data/all_other_fields.csv")
 
 
 
