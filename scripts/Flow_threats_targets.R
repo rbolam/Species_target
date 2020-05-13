@@ -43,6 +43,7 @@ threats_summ$thr_lev1name <- factor(threats_summ$thr_lev1name, levels(threats_su
 
 
 ## --------------------------- Code for figure 1 --------------------------####
+## ------------------------------- Option 1 -------------------------------####
 
 ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
   geom_alluvium(aes(fill = thr_lev1name), alpha = 0.9, aes.bind = TRUE, width = 1/4) +
@@ -75,73 +76,10 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
 ggsave("figures/flow_option1.png", width = 7, height = 5, dpi = 600)
 
 
-
-
-
-ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
-  geom_alluvium(aes(fill = thr_lev1name), alpha = 0.9, aes.bind = TRUE, width = 1/4) +
-  geom_stratum(size = 0.5, colour = "white", width = 1/4, fill = 
-                 c("white", NA, NA, rep("white", 5), rep("grey90", 4), "white", "white")) +
-  ## Polygons for threats:
-  annotate("polygon", x = x, y = c(thr$ymin[1], thr$ymax[1], thr$y2[1], thr$y1[1]), 
-           fill = viridis(8, option = "E")[1], alpha = 0.9, colour = NA) + 
-  annotate("polygon", x = x, y = c(thr$ymin[2], thr$ymax[2], thr$y2[2], thr$y1[2]), 
-           fill = viridis(8, option = "E")[2], alpha = 0.9, colour = NA) +  
-  annotate("polygon", x = x, y = c(thr$ymin[3], thr$ymax[3], thr$y2[3], thr$y1[3]), 
-           fill = viridis(8, option = "E")[3], alpha = 0.9, colour = NA) +  
-  annotate("polygon", x = x, y = c(thr$ymin[4], thr$ymax[4], thr$y2[4], thr$y1[4]), 
-           fill = viridis(8, option = "E")[4], alpha = 0.9, colour = NA) +  
-  annotate("polygon", x = x, y = c(thr$ymin[5], thr$ymax[5], thr$y2[5], thr$y1[5]), 
-           fill = viridis(8, option = "E")[5], alpha = 0.9, colour = NA) +  
-  annotate("polygon", x = x, y = c(thr$ymin[6], thr$ymax[6], thr$y2[6], thr$y1[6]), 
-           fill = viridis(8, option = "E")[8], alpha = 0.9, colour = NA) +  
-  
-  # Rectangles for threats:  
-    annotate("rect", xmin = 0.875, xmax = 1, ymin = thr$ymin, ymax = thr$ymax, 
-           fill = viridis(8, option = "E")[c(1:5,8)], alpha = 0.9, colour = NA) +
-
-  #Polygon/rectangle for no target:
-  annotate("polygon", x = c(1.875, 1.875, 2, 2), y = c(22558, 25465, 25000, 23024), 
-           fill = "grey10", alpha = 0.9, colour = NA) +
-  annotate("rect", xmin = 2, xmax = 2.125, ymin = 23024, ymax = 25000, 
-           fill = "grey10", alpha = 0.9, colour = NA) +
-  
-  #Polygon/rectangle for targets 1 & 2:
-  annotate("polygon", x = c(1.875, 1.875, 2, 2), y = c(9052, 22558, 18825, 12786), 
-           fill = "grey90", alpha = 0.9, colour = NA) +  
-  annotate("rect", xmin = 2, xmax = 2.125, ymin = 12786, ymax = 18825, 
-           fill = "grey90", alpha = 0.9, colour = NA) +
-  
-  ## Add labels:
-  geom_text(stat = "stratum", infer.label = FALSE, size = 2, fontface = "bold",  
-            colour = c(rep("grey10", 4), rep("grey90", 4), rep("grey10", 5), "grey90"),
-            label = c("Other (2,055)", 
-                      "Climate change & severe\nweather (1,320)",
-                      "Pollution (1,460)", 
-                      "Natural system modifications\n(1,521)", 
-                      "Invasive & other problematic\nspecies (1,921)", 
-                      "Residential & commercial\ndevelopment (2,318)", 
-                      "Agriculture & aquaculture\n(4,441)", 
-                      "Biological resource use (4,583)", 
-                      "Target 6 - Climate change\n(1,320)", 
-                      "Target 5 - Harvesting & trade\n(4,583)", 
-                      "Target 4 - Pollution (1,460)", 
-                      "Target 3 - Invasive species\n(1,683)", 
-                      "Target 1 & 2 - Ecosystems &\nprotected areas (6,039)",
-                      "Not addressed by targets\n(1,976)")) +
-  scale_x_discrete(limits = c("Threat", "Post-2020 Framework"), name = "", expand = c(.001, 0)) + 
-  scale_y_continuous(name = "Number of species", expand = c(0.001, 0)) + 
-  scale_fill_viridis_d(option = "E", direction = 1) +
-  theme_classic() +
-  theme(legend.position = "none",
-        text = element_text(size = 9),
-        axis.ticks.x = element_blank())
-
-ggsave("figures/flow_option2.png", width = 7, height = 5, dpi = 600) 
+## ------------------------------- Option 2 -------------------------------####
 
 x <- c(1, 1, 1.124, 1.124)
 
-nspp <- sum(threats_summ$n)
 
 threats_summ %>% 
   group_by(target) %>% 
@@ -158,17 +96,17 @@ tar <- full_join(tar_all, tar_n, by = "target")
 tar <- mutate(tar, double = all - n)
 
 # Calculate values
-## Spp npt addressed by targets:
-sum(tar$all) - tar[6,2] + (tar[6,4]/2)
-sum(tar$all) - (tar[6,4]/2)
-sum(tar$all)
-sum(tar$all) - tar[6,2]
+## Spp not addressed by targets:
+sum(tar$all) - tar[6,2] + (tar[6,4]/2) #top of rectangle
+sum(tar$all) - (tar[6,4]/2) #bottom of rectangle
+sum(tar$all) #top of polygon
+sum(tar$all) - tar[6,2] #bottom of polygon
 
-
-sum(tar$all) - tar[6,2] - tar[1,2] + (tar[1,4]/2)
-sum(tar$all) - tar[6,2] - (tar[1,4]/2)
-sum(tar$all) - tar[6,2]
-sum(tar$all) - tar[6,2] - tar[1,2]
+## Spp addressed by targets 1 and 2:
+sum(tar$all) - tar[6,2] - tar[1,2] + (tar[1,4]/2) #top of rectangle
+sum(tar$all) - tar[6,2] - (tar[1,4]/2) #bottom of rectangle
+sum(tar$all) - tar[6,2] #top of polygon
+sum(tar$all) - tar[6,2] - tar[1,2] #bottom of polygon
 
 
 threats_summ %>% 
@@ -208,21 +146,68 @@ thr <- filter(thr, double > 0)
 
 
 
-n_notar <- sum(threats_summ$n[is.na(threats_summ$target)])
+ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
+  geom_alluvium(aes(fill = thr_lev1name), alpha = 0.9, aes.bind = TRUE, width = 1/4) +
+  geom_stratum(size = 0.5, colour = "white", width = 1/4, fill = 
+                 c("white", NA, NA, rep("white", 5), rep("grey90", 4), "white", "white")) +
+  ## Polygons for threats:
+  annotate("polygon", x = x, y = c(thr$ymin[1], thr$ymax[1], thr$y2[1], thr$y1[1]), 
+           fill = viridis(8, option = "E")[1], alpha = 0.9, colour = NA) + 
+  annotate("polygon", x = x, y = c(thr$ymin[2], thr$ymax[2], thr$y2[2], thr$y1[2]), 
+           fill = viridis(8, option = "E")[2], alpha = 0.9, colour = NA) +  
+  annotate("polygon", x = x, y = c(thr$ymin[3], thr$ymax[3], thr$y2[3], thr$y1[3]), 
+           fill = viridis(8, option = "E")[3], alpha = 0.9, colour = NA) +  
+  annotate("polygon", x = x, y = c(thr$ymin[4], thr$ymax[4], thr$y2[4], thr$y1[4]), 
+           fill = viridis(8, option = "E")[4], alpha = 0.9, colour = NA) +  
+  annotate("polygon", x = x, y = c(thr$ymin[5], thr$ymax[5], thr$y2[5], thr$y1[5]), 
+           fill = viridis(8, option = "E")[5], alpha = 0.9, colour = NA) +  
+  annotate("polygon", x = x, y = c(thr$ymin[6], thr$ymax[6], thr$y2[6], thr$y1[6]), 
+           fill = viridis(8, option = "E")[8], alpha = 0.9, colour = NA) +  
+  
+  # Rectangles for threats:  
+  annotate("rect", xmin = 0.875, xmax = 1, ymin = thr$ymin, ymax = thr$ymax, 
+           fill = viridis(8, option = "E")[c(1:5,8)], alpha = 0.9, colour = NA) +
 
-nspp - n_notar + ((n_notar - 1976) / 2)
+  #Polygon/rectangle for no target:
+  annotate("polygon", x = c(1.875, 1.875, 2, 2), y = c(22620, 25528, 25063, 23086), 
+           fill = "grey10", alpha = 0.9, colour = NA) +
+  annotate("rect", xmin = 2, xmax = 2.125, ymin = 23068, ymax = 25063, 
+           fill = "grey10", alpha = 0.9, colour = NA) +
+  
+  #Polygon/rectangle for targets 1 & 2:
+  annotate("polygon", x = c(1.875, 1.875, 2, 2), y = c(9102, 22620, 18890, 12832), 
+           fill = "grey90", alpha = 0.9, colour = NA) +  
+  annotate("rect", xmin = 2, xmax = 2.125, ymin = 12832, ymax = 18890, 
+           fill = "grey90", alpha = 0.9, colour = NA) +
+  
+  ## Add labels:
+  geom_text(stat = "stratum", infer.label = FALSE, size = 2, fontface = "bold",  
+            colour = c(rep("grey10", 4), rep("grey90", 4), rep("grey10", 5), "grey90"),
+            label = c("Other (2,055)", 
+                      "Climate change & severe\nweather (1,339)",
+                      "Pollution (1,472)", 
+                      "Natural system modifications\n(1,517)", 
+                      "Invasive & other problematic\nspecies (1,926)", 
+                      "Residential & commercial\ndevelopment (2,321)", 
+                      "Agriculture & aquaculture\n(4,447)", 
+                      "Biological resource use (4,596)", 
+                      "Target 6 - Climate change\n(1,339)", 
+                      "Target 5 - Harvesting & trade\n(4,596)", 
+                      "Target 4 - Pollution (1,472)", 
+                      "Target 3 - Invasive species\n(1,695)", 
+                      "Target 1 & 2 - Ecosystems &\nprotected areas (6,058)",
+                      "Not addressed by targets\n(1,977)")) +
+  scale_x_discrete(limits = c("Threat", "Post-2020 Framework"), name = "", expand = c(.001, 0)) + 
+  scale_y_continuous(name = "Number of species", expand = c(0.001, 0)) + 
+  scale_fill_viridis_d(option = "E", direction = 1) +
+  theme_classic() +
+  theme(legend.position = "none",
+        text = element_text(size = 9),
+        axis.ticks.x = element_blank())
+
+ggsave("figures/flow_option2.png", width = 7, height = 5, dpi = 600) 
 
 
-no_spp <- threats %>% select(scientificName) %>% unique() %>% nrow()
-
-nspp - 13506 - n_notar + ((13506 - 6039)/2)
-
-b <- threats %>% 
-  select(scientificName, target) %>% 
-  unique() %>% 
-  count(target)
-
-b$target[is.na(b$target)] <- "Threats not addressed\nby target" 
 
 ggplot(b, aes(x = fct_rev(target), y = n, fill = target)) + 
   geom_col() +
