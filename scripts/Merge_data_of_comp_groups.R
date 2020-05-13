@@ -181,32 +181,3 @@ match$thr_lev2 <- as.character(match$thr_lev2)
 stresses <- left_join(stresses, match, by = c("thr_lev2", "stressName", "thr_lev2name"))
 write_csv(stresses, "data/spp_tar.csv")
 
-
-
-#####################################################
-
-n_spp <- 
-  read.csv("data/simple_summaries.csv") %>% 
-  nrow()
-
-spp <- read.csv("data/spp_tar.csv")
-
-spp %>% 
-  select(scientificName, target) %>% 
-  unique() %>% 
-  count(target)# %>% 
-  mutate(n = n / n_spp * 100)
-
-spp %>% 
-  left_join(match, by = c("thr_lev2", "stress", "thr2_name")) %>% 
-  filter(!is.na(target)) %>% 
-  select(scientificName) %>% 
-  unique() ->
-  spp2
-
-spp %>% 
-  left_join(match, by = c("thr_lev2", "stress", "thr2_name")) %>% 
-  filter(!scientificName %in% spp2$scientificName) %>% 
-  select(scientificName) %>% 
-  unique() %>% 
-  nrow()
