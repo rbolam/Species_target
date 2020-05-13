@@ -18,7 +18,7 @@ actions$name[actions$code %in% c("5.4.1", "5.4.2", "5.4.3", "5.4.4")] <- c("Comp
 actions$redlistCategory <- factor(actions$redlistCategory)
 actions$redlistCategory <- factor(actions$redlistCategory, levels(actions$redlistCategory)[c(4, 2, 1, 3)])
 
-
+write_csv(actions, "data/actions_needed_tidy.csv")
 
 actions %>% 
   select(scientificName, name, redlistCategory) %>% 
@@ -36,26 +36,3 @@ actions %>%
         text = element_text(size = 7))
 ggsave("figures/actions.png", height = 8, width = 12, dpi = 300, unit = "cm")
 
-
-
-## ---------------------------- Add number of spp requiring each action and save -----------------####
-
-actions %>% 
-  select(scientificName, code, name) %>% 
-  separate(col = code, into = c("A1", "A2"), sep = "[.]") %>% 
-  unite(code, A1:A2, sep = ".") ->
-  no_actions
-
-no_actions$name[no_actions$code == 3.1] <- c("Species management")
-no_actions$name[no_actions$code == 3.3] <- c("Species re-introduction")
-no_actions$name[no_actions$code == 3.4] <- c("Ex-situ conservation")
-no_actions$name[no_actions$code == 5.1] <- c("Legislation")
-no_actions$name[no_actions$code == 5.4] <- c("Compliance and enforcement")
-
-no_actions %>% 
-  unique() %>% 
-  group_by(code, name) %>% 
-  count() ->
-  no_actions
-
-write_csv(no_actions, "data/number_of_actions.csv")
