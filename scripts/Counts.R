@@ -60,22 +60,23 @@ act %>%
 
 
 
-library(tidyverse)
+## ------------------- Identifying spp which need emergency actions ------------------------####
+
 summaries <- read.csv("data/simple_summaries.csv")
 
 summaries <- summaries %>% 
-  select(scientificName, kingdomName, phylumName, className, redlistCategory, redlistCriteria) %>% 
-  separate(redlistCriteria, sep = ";", into = c("c1", "c2", "c3", "c4")) %>% 
-  gather(key = "c", value = "criterion", 6:9) %>% 
-  select(-c) %>% 
-  filter(!is.na(criterion))
+  select(scientificName, kingdomName, phylumName, className, redlistCategory, 
+         redlistCriteria) %>% 
+  separate_rows(redlistCriteria, sep = ";") %>% 
+  filter(!is.na(redlistCriteria))
+
+summaries$criterion <- str_squish(summaries$redlistCriteria)
 
 no_c <- count(summaries, scientificName)
-
 summaries <- left_join(summaries, no_c, by = "scientificName")
-summaries$criterion <- str_squish(summaries$criterion)
 
-a <- count(summaries, criterion)
+
+a <- count(summaries, redlistCriteria)
 ## Create columns that indicate which spp fall into which category:
 
 # Now excluded:
@@ -90,8 +91,8 @@ summaries$c <- str_detect(summaries$criterion, "[c]")
 filter(summaries, B == TRUE & a == TRUE & c == TRUE)
 
 
-test <- filter(summaries, criterion == "D" & n %in% c(1,2) | 
-                 criterion == "D1" & n %in% c(1, 2) | 
+test <- filter(summaries, redlistCriteria == "D" & n %in% c(1,2) | 
+                 redlistCriteria == "D1" & n %in% c(1, 2) | 
                  B == TRUE & a == TRUE & c == TRUE & n %in% c(1,2)
 )
 n_test <- count(test, scientificName, name = "n_test")
@@ -99,7 +100,7 @@ n_test <- count(test, scientificName, name = "n_test")
 test <- left_join(test, n_test, by = "scientificName")
 test2 <- test %>% 
   filter(n == n_test) %>% 
-  select(-n, -n_test, -B, -a, -c, -criterion) %>% 
+  select(-n, -n_test, -B, -a, -c, -redlistCriteria) %>% 
   unique()
 
 
