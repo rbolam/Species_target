@@ -3,6 +3,7 @@
 ## --------------------------------------------------------------------------------------##
 
 library(tidyverse)
+library(gridExtra)
 
 summaries <- read.csv("data/simple_summaries.csv")
 nspp <- summaries %>% select(scientificName) %>% unique() %>% nrow()
@@ -75,7 +76,7 @@ summaries <- summaries %>%
 
 ## Remove empty spaces:
 
-summaries$criterion <- str_squish(summaries$redlistCriteria)
+summaries$redlistCriteria <- str_squish(summaries$redlistCriteria)
 
 
 ## Add columns that extract criteria:
@@ -84,47 +85,54 @@ summaries$C <- str_detect(summaries$redlistCriteria, "[C]")
 summaries$C2ai <- str_detect(summaries$redlistCriteria, "C2a\\(i\\)")
 summaries$D <- str_detect(summaries$redlistCriteria, "[D]")
 
+summaries$B <- str_detect(summaries$redlistCriteria, "B")
+summaries$a <- str_detect(summaries$redlistCriteria, "[a]")
+summaries$c <- str_detect(summaries$redlistCriteria, "[c]")
+
 
 ## -------------- Spp which need threat abatement AND emergency actions -------------------####
 
 suma <- summaries
 
 suma <- filter(suma, D == TRUE | C2ai == TRUE |
-               C == TRUE & redlistCategory == "Critically Endangered")
+                 C == TRUE & redlistCategory == "Critically Endangered" |
+                 B == TRUE & a == TRUE & c == TRUE)
 
-suma %>% group_by(C, C2ai, D) %>%  count()
+suma %>% group_by(C, C2ai, D, B) %>%  count()
 
-
-
-
-
+suma %>% select(scientificName) %>% unique() %>% nrow() /nrow(summaries) * 100
 
 
 
+## Check taxonomy of those spp:
+
+class <- count(summaries, className, name = "Countall")
+class2 <- count(suma, className, name = "Countemer")
+class <- class %>% 
+  full_join(class2, by = "className") %>% 
+  replace_na(list(Countall = 0, Countemer = 0)) %>% 
+  mutate(perc = Countemer / Countall * 100)
+
+a <- ggplot(class, aes(x = fct_reorder(className, perc), y = perc)) + geom_col() + 
+  coord_flip(ylim = c(0, 100)) + labs(x = "", y = "Percent")
+b <- ggplot(class, aes(x = fct_reorder(className, Countemer), y = Countemer)) + geom_col() + 
+  coord_flip()  + labs(x = "", y = "Number of species")
+grid.arrange(a, b, nrow = 1)  
+
+
+
+## -------------- Spp which need emergency actions only -------------------####
 
 no_c <- count(suma, scientificName)
-summaries <- left_join(suma, no_c, by = "scientificName")
+sumb <- left_join(suma, no_c, by = "scientificName")
 
 
-a <- count(summaries, redlistCriteria)
-## Create columns that indicate which spp fall into which category:
-
-# Now excluded:
-#summaries$C <- str_detect(summaries$redlistCriteria, "[C]")
-#summaries$C2ai <- str_detect(summaries$redlistCriteria, "C2a\\(i\\)")
-
-# Not working:
-#summaries$Bac <- str_detect(summaries$criterion, "B.a[c]")
-summaries$B <- str_detect(summaries$criterion, "B")
-summaries$a <- str_detect(summaries$criterion, "[a]")
-summaries$c <- str_detect(summaries$criterion, "[c]")
-filter(summaries, B == TRUE & a == TRUE & c == TRUE)
 
 
-test <- filter(summaries, redlistCriteria == "D" & n %in% c(1,2) | 
+test <- filter(sumb, redlistCriteria == "D" & n %in% c(1,2) | 
                  redlistCriteria == "D1" & n %in% c(1, 2) | 
-                 B == TRUE & a == TRUE & c == TRUE & n %in% c(1,2)
-)
+                 B == TRUE & a == TRUE & c == TRUE & n %in% c(1,2))
+
 n_test <- count(test, scientificName, name = "n_test")
 
 test <- left_join(test, n_test, by = "scientificName")
