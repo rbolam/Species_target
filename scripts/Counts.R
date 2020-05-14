@@ -1,6 +1,6 @@
-## ------------------------------------------------------------------------------------####
+## --------------------------------------------------------------------------------------##
 ## -------------------- Counting different species groups -----------------------------####
-## ------------------------------------------------------------------------------------####
+## --------------------------------------------------------------------------------------##
 
 library(tidyverse)
 
@@ -64,16 +64,46 @@ act %>%
 
 summaries <- read.csv("data/simple_summaries.csv")
 
+
+## Turn into one row per criterion:
+
 summaries <- summaries %>% 
   select(scientificName, kingdomName, phylumName, className, redlistCategory, 
          redlistCriteria) %>% 
   separate_rows(redlistCriteria, sep = ";") %>% 
   filter(!is.na(redlistCriteria))
 
+## Remove empty spaces:
+
 summaries$criterion <- str_squish(summaries$redlistCriteria)
 
-no_c <- count(summaries, scientificName)
-summaries <- left_join(summaries, no_c, by = "scientificName")
+
+## Add columns that extract criteria:
+
+summaries$C <- str_detect(summaries$redlistCriteria, "[C]")
+summaries$C2ai <- str_detect(summaries$redlistCriteria, "C2a\\(i\\)")
+summaries$D <- str_detect(summaries$redlistCriteria, "[D]")
+
+
+## -------------- Spp which need threat abatement AND emergency actions -------------------####
+
+suma <- summaries
+
+suma <- filter(suma, D == TRUE | C2ai == TRUE |
+               C == TRUE & redlistCategory == "Critically Endangered")
+
+suma %>% group_by(C, C2ai, D) %>%  count()
+
+
+
+
+
+
+
+
+
+no_c <- count(suma, scientificName)
+summaries <- left_join(suma, no_c, by = "scientificName")
 
 
 a <- count(summaries, redlistCriteria)
