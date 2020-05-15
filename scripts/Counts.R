@@ -7,6 +7,7 @@ library(gridExtra)
 
 summaries <- read.csv("data/simple_summaries.csv")
 nspp <- summaries %>% select(scientificName) %>% unique() %>% nrow()
+nspp / 36602 *100  ## calculate % of all spp that are threatened + EW
 
 
 ## ----------------------- Counts threats, targets, actions --------------------------------####
@@ -20,6 +21,7 @@ thr_str %>%
   unique() %>% 
   count(thr_lev1name) %>% 
   mutate(perc1 = n / nspp * 100) %>% ## calculate % of threatened/EW spp
+  mutate(perc2 = n / 36602 * 100) %>% ## calculate % of all spp
   arrange(-n)
 
 
@@ -30,6 +32,7 @@ thr_str %>%
   unique() %>% 
   count(target) %>% 
   mutate(perc1 = n / nspp * 100) %>% ## calculate % of threatened/EW spp
+  mutate(perc2 = n / 36602 * 100) %>% ## calculate % of all spp
   arrange(-n)
 
 
@@ -40,6 +43,7 @@ act %>%
   unique() %>% 
   count(name) %>% 
   mutate(perc1 = n / nspp * 100) %>% ## calculate % of threatened/EW spp
+  mutate(perc2 = n / 36602 * 100) %>% ## calculate % of all spp
   arrange(-n)
 
 
