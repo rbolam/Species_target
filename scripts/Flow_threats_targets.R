@@ -328,12 +328,13 @@ summaries <- summaries %>%
   left_join(sppact, by = "scientificName")
 
 
+
 ## Sort country level data
 
 
 countriesmatch <- read.csv("data/countrymatching.csv")
 
-## Retain releavnt categories only:
+## Retain relevant categories only:
 
 countries <- countries %>% 
   filter(origin %in% c("Native", "Reintroduced")) %>% 
@@ -344,29 +345,85 @@ countries <- countries %>%
   select(-name) %>% 
   unique()
 
+summaries <- left_join(summaries, countries, by = "scientificName")
 
+
+## Count no of spp in different groups:
+
+summaries %>% 
+  filter(spptar == "yes") %>% 
+  select(scientificName, name) %>% 
+  unique() %>% 
+  count(name, name = "n_tar") ->
+  n_tar
+
+summaries %>% 
+  filter(sppthract == "yes") %>% 
+  select(scientificName, name) %>% 
+  unique() %>% 
+  count(name, name = "n_thract") ->
+  n_thract
+
+summaries %>% 
+  filter(sppact == "yes") %>% 
+  select(scientificName, name) %>% 
+  unique() %>% 
+  count(name, name = "n_act") ->
+  n_act
+
+spp_cou <- n_tar %>% 
+  full_join(n_thract, by = "name") %>% 
+  full_join(n_act, by = "name") %>% 
+  replace_na(list(n_tar = 0, n_thract = 0, n_act = 0)) %>% 
+  rename(region = name)
 
 
 map.all <- map_data(map = "world")
-map.all <- full_join(map.all, countrysum, by = "region") 
+map.all <- full_join(map.all, spp_cou, by = "region") 
 
 
 
 
-(ggplot() + 
+ggplot() + 
   geom_map(data = map.all, map = map.all, 
-           aes(map_id = region, x = long, y = lat, fill = n), colour = "black", size = 0.1) + 
-  #scale_fill_distiller(palette = "YlOrRd", direction = 1) +
-  scale_fill_gradient2(low = "#ffffb2", high = "#bd0026", mid = "#fd8d3c", midpoint = 220, name = "Number\nof species") +
-  coord_proj("+proj=cea +lat_ts=37.5") +
-  #labs(tag = "b)", x = "", y = "") + 
+           aes(map_id = region, x = long, y = lat, fill = n_tar), colour = "black", size = 0.1) + 
+  scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "N") +
+  #coord_proj("+proj=cea +lat_ts=37.5") +
+  labs(tag = "", x = "", y = "", title = "Species with threats not addressed by targets") + 
   guides(colour = "none") +
   theme_void() +
   theme(text = element_text(size = 7),
         legend.key.size = unit(0.4, "cm")) ->
-  b)
+  a
+
+ggplot() + 
+  geom_map(data = map.all, map = map.all, 
+           aes(map_id = region, x = long, y = lat, fill = n_thract), colour = "black", size = 0.1) + 
+  scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "N") +
+  #coord_proj("+proj=cea +lat_ts=37.5") +
+  labs(tag = "", x = "", y = "", title = "Species which need species-specific actions") + 
+  guides(colour = "none") +
+  theme_void() +
+  theme(text = element_text(size = 7),
+        legend.key.size = unit(0.4, "cm")) ->
+  b
+
+ggplot() + 
+  geom_map(data = map.all, map = map.all, 
+           aes(map_id = region, x = long, y = lat, fill = n_act), colour = "black", size = 0.1) + 
+  scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "N") +
+  #coord_proj("+proj=cea +lat_ts=37.5") +
+  labs(tag = "", x = "", y = "", title = "Species which need species-specific actions only") + 
+  guides(colour = "none") +
+  theme_void() +
+  theme(text = element_text(size = 7),
+        legend.key.size = unit(0.4, "cm")) ->
+  c
 
 
+
+d <- grid.arrange(a, b, c, ncol = 1)
+ggsave("figures/map_options.jpg", d, width = 4, height = 8)
 
 c <- ggdraw() +
   draw_plot(a) +
