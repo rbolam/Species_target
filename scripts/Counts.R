@@ -113,15 +113,12 @@ suma <- filter(suma, Bac == TRUE | C == TRUE & redlistCategory == "Critically En
                  D == TRUE & redlistCategory %in% c("Critically Endangered", "Endangered"))
 
 
-## Check counts: 
-
-
 suma %>% select(scientificName) %>% unique() %>% nrow() / nspp * 100
 
 
 
 suma %>% 
-  group_by(redlistCategory, B, C, C2ai, D) %>% 
+  group_by(redlistCategory, Bac, C, C2ai, D, D1) %>% 
   count() %>% 
   gather(-redlistCategory, -n, key = "crit", value = "TF") %>% 
   filter(TF == TRUE) %>% 
@@ -144,46 +141,34 @@ b <- ggplot(class, aes(x = fct_reorder(className, Countemer), y = Countemer)) + 
 grid.arrange(a, b, nrow = 1)  
 
 
+suma %>% 
+  select(scientificName) %>% 
+  unique() %>% 
+  write_csv("data/spp_needing_thr_aba_act.csv")
+
 
 ## -------------- Spp which need emergency actions only -------------------####
 
-no_c <- count(suma, scientificName)
-sumb <- left_join(suma, no_c, by = "scientificName")
+## Count total criteria per spp:
+no_c <- count(summaries, scientificName, name = "allcrit")
 
 
+## Count the selected criteria per spp:
+no_a <- count(suma, scientificName, name = "selcrit")
 
 
-test <- filter(sumb, redlistCriteria == "D" & n %in% c(1,2) | 
-                 redlistCriteria == "D1" & n %in% c(1, 2) | 
-                 B == TRUE & a == TRUE & c == TRUE & n %in% c(1,2))
+## Combine, calculate difference, and retain only spp where nos are the same:
+sumb <- suma %>% 
+  left_join(no_c, by = "scientificName") %>% 
+  left_join(no_a, by = "scientificName") %>% 
+  mutate(diff = allcrit - selcrit) %>% 
+  filter(diff == 0)
 
-n_test <- count(test, scientificName, name = "n_test")
-
-test <- left_join(test, n_test, by = "scientificName")
-test2 <- test %>% 
-  filter(n == n_test) %>% 
-  select(-n, -n_test, -B, -a, -c, -redlistCriteria) %>% 
-  unique()
-
-
-## figure out how to retain both criteria!!
-
-
-## Compare to spp which have threats that are not being abated
-
-threats <- read.csv("data/spp_tar.csv")
-threats <- threats %>% 
-  filter(is.na(target)) %>% 
+sumb %>% 
   select(scientificName) %>% 
-  unique()
+  unique() %>% 
+  write_csv("data/spp_needing_act.csv")
 
-test2 %>% 
-  filter(scientificName %in% threats$scientificName) %>% 
-  nrow() #
-count(redlistCategory) ->
-  a
-count(test, redlistCategory) ->b
-c <- full_join(a, b, by = "redlistCategory")
-c <- mutate(c, perc = n.x / n.y * 100)
+
 
 
