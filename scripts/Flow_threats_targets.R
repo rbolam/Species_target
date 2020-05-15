@@ -273,41 +273,73 @@ ggplot(c, aes(x = fct_reorder(thr_lev1name, ord), y = n, fill = target)) +
 c <- grid.arrange(plotb, plota, nrow = 1)
 ggsave("figures/option3.jpg", c, )
 
-## ---------------------------- Map -------------------------------####
-folders <- list.files("data/rl_download_02_03_2020/") ## make list of files in folder
+
+
+
+## -------------------------------------- Maps -----------------------------------####
+
+folders <- list.files("data/rl_download_12_05_2020/") ## make list of files in folder
 countries <- data.frame()
 
 
 for(i in 1:length(folders)) {
-  countr <- read.csv(paste("data/rl_download_02_03_2020/", folders[i], "/countries.csv", sep = ""), na.string = 
-                     c("", "NA"))
+  countr <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/countries.csv", 
+                           sep = ""), na.string = c("", "NA"))
   countries <- bind_rows(countries, countr)
 }
 
-sppmatched <- read.csv("data/spp_thr_str.csv")
 
-tarmatched <- read.csv("data/thr_str_tar_matched.csv")
-sppmatched <- sppmatched %>% 
-  left_join(tarmatched, by = c("thr_lev2", "stress", "thr2_name")) %>% 
+
+## Load spp files:
+
+## spp matched to targets:
+
+spptar <- read.csv("data/spp_tar.csv") 
+
+spptar <- spptar %>% 
   filter(is.na(target)) %>% 
   select(scientificName) %>% 
   unique()
 
+
+## Add col to indicate these spp have threats not matched by targets:
+spptar$spptar <- "yes"
+
+
+
+## Spp that need threat abatement and actions:
+
+sppthract <- read.csv("data/spp_needing_thr_aba_act.csv") 
+sppthract$sppthract <- "yes"
+
+
+## Spp that need actions only:
+
+sppact <- read.csv("data/spp_needing_act.csv") 
+sppact$sppact <- "yes"
+
+
+
 summaries <- read.csv("data/simple_summaries.csv")
 
-sppmatched <- left_join(sppmatched, summaries, by = "scientificName")
+summaries <- summaries %>% 
+  left_join(spptar, by = "scientificName") %>% 
+  left_join(sppthract, by = "scientificName") %>% 
+  left_join(sppact, by = "scientificName")
 
-countries %>% 
-  filter(scientificName %in% sppmatched$scientificName) %>% 
+
+## Sort country level data
+
+
+countriesmatch <- read.csv("data/countrymatching.csv")
+
+## Retain releavnt categories only:
+
+countries <- countries %>% 
   filter(origin %in% c("Native", "Reintroduced")) %>% 
   filter(presence %in% c("Extant", "Possibly Extant", "Presence Uncertain")) %>% 
   select(scientificName, name) %>% 
   unique() %>% 
-  count(name) ->
-  countrysum
-
-countriesmatch <- read.csv("data/countrymatching.csv")
-countrysum <- countrysum %>% 
   full_join(countriesmatch, by = "name") %>% 
   select(-name) %>% 
   unique()
