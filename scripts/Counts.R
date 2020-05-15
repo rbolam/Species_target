@@ -186,6 +186,13 @@ sumb <- suma %>%
   mutate(diff = allcrit - selcrit) %>% 
   filter(diff == 0)
 
+## Percent of spp that need threat abatement and emergency actions, of all threatened + EW spp:
+sumb %>% select(scientificName) %>% unique() %>% nrow() / nspp * 100
+
+## Percent of spp that need threat abatement and emergency actions, of all spp:
+sumb %>% select(scientificName) %>% unique() %>% nrow() / 36602 * 100
+
+
 sumb %>% 
   select(scientificName) %>% 
   unique() %>% 
