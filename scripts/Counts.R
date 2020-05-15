@@ -79,12 +79,15 @@ threats %>%
 
 
 summaries <- read.csv("data/simple_summaries.csv")
+mature <- read.csv("data/all_other_fields.csv")
+
+summaries <- full_join(summaries, mature, by = "scientificName")
 
 ## Turn into one row per criterion:
 
 summaries <- summaries %>% 
   select(scientificName, kingdomName, phylumName, className, redlistCategory, 
-         redlistCriteria) %>% 
+         redlistCriteria, PopulationSize.range) %>% 
   separate_rows(redlistCriteria, sep = ";") %>% 
   filter(!is.na(redlistCriteria))
 
@@ -101,11 +104,12 @@ summaries$C2ai <- str_detect(summaries$redlistCriteria, "C2a\\(i[^ii]") ##any th
 ## but not C2a(ii
 summaries$D <- str_detect(summaries$redlistCriteria, "^D$") ##any exact matches to D
 summaries$D1 <- str_detect(summaries$redlistCriteria, "^D1$") ##any exact matches to D1
+summaries$Bac <- str_detect(summaries$redlistCriteria, "^B.a.*?c") ##any that start with B, 
+## followed by any character, followed by a. *?c means anything in between, then c
 
 
-summaries$Bac <- str_detect(summaries$redlistCriteria, "^B.a.*?c") ##any that start with B, followed by
-## any character, followed by a. *?c means anything in between, then c
-
+## Deal with mature individuals data:
+summaries <- separate(summaries, PopulationSize.range, sep = "-", into = c("lowpop", "highpop"))
 
 
 ## -------------- Spp which need threat abatement AND emergency actions -------------------####
