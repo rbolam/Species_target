@@ -1,6 +1,6 @@
-## --------------------------------------------------------------------------------------##
-## -------------------- Counting different species groups -----------------------------####
-## --------------------------------------------------------------------------------------##
+## --------------------------------------------------------------------------------------------##
+## ----------------------- Counting different species groups --------------------------------####
+## --------------------------------------------------------------------------------------------##
 
 library(tidyverse)
 library(gridExtra)
@@ -9,27 +9,11 @@ summaries <- read.csv("data/simple_summaries.csv")
 nspp <- summaries %>% select(scientificName) %>% unique() %>% nrow()
 
 
-## Count corals threatened by temperature extremes:
-thr_str <- read.csv("data/spp_tar.csv")
-thr_str %>%  
-  left_join(summaries, by = "scientificName") %>% 
-  filter(phylumName == "CNIDARIA" & thr_lev2 == "11.3") %>% 
-  select(scientificName) %>% 
-  unique() %>% 
-  nrow()
-
-
-## Count amphibians threatened by chytrid disease:
-threats <- read.csv("data/threats.csv")
-threats %>% 
-  left_join(summaries, by = "scientificName") %>% 
-  filter(className == "AMPHIBIA" & ias == "Batrachochytrium dendrobatidis") %>% 
-  select(scientificName) %>% 
-  unique() %>% 
-  nrow()
+## ----------------------- Counts threats, targets, actions --------------------------------####
 
 
 ## Count spp threatened by each threat (level 1):
+
 thr_str <- read.csv("data/spp_tar.csv")
 thr_str %>% 
   select(scientificName, thr_lev1name) %>% 
@@ -61,10 +45,36 @@ act %>%
 
 
 
+## ----------------- Identifying spp for which threats can't be tackled --------------------####
+
+
+## Count corals threatened by temperature extremes:
+
+thr_str <- read.csv("data/spp_tar.csv")
+thr_str %>%  
+  left_join(summaries, by = "scientificName") %>% 
+  filter(phylumName == "CNIDARIA" & thr_lev2 == "11.3") %>% 
+  select(scientificName) %>% 
+  unique() %>% 
+  nrow()
+
+
+## Count amphibians threatened by chytrid disease:
+threats <- read.csv("data/threats.csv")
+threats %>% 
+  left_join(summaries, by = "scientificName") %>% 
+  filter(className == "AMPHIBIA" & ias == "Batrachochytrium dendrobatidis") %>% 
+  select(scientificName) %>% 
+  unique() %>% 
+  nrow()
+
+
+
+
 ## ------------------- Identifying spp which need emergency actions ------------------------####
 
-summaries <- read.csv("data/simple_summaries.csv")
 
+summaries <- read.csv("data/simple_summaries.csv")
 
 ## Turn into one row per criterion:
 
@@ -74,6 +84,7 @@ summaries <- summaries %>%
   separate_rows(redlistCriteria, sep = ";") %>% 
   filter(!is.na(redlistCriteria))
 
+
 ## Remove empty spaces:
 
 summaries$redlistCriteria <- str_squish(summaries$redlistCriteria)
@@ -81,28 +92,41 @@ summaries$redlistCriteria <- str_squish(summaries$redlistCriteria)
 
 ## Add columns that extract criteria:
 
-summaries$C <- str_detect(summaries$redlistCriteria, "[C]")
-summaries$C2ai <- str_detect(summaries$redlistCriteria, "C2a\\(i\\)")
-summaries$D <- str_detect(summaries$redlistCriteria, "[D]")
+summaries$C <- str_detect(summaries$redlistCriteria, "C") ## any that contain C
+summaries$C2ai <- str_detect(summaries$redlistCriteria, "C2a\\(i[^ii]") ##any that contain C2a(i,
+## but not C2a(ii
+summaries$D <- str_detect(summaries$redlistCriteria, "^D$") ##any exact matches to D
+summaries$D1 <- str_detect(summaries$redlistCriteria, "^D1$") ##any exact matches to D1
 
-summaries$B <- str_detect(summaries$redlistCriteria, "B")
-summaries$a <- str_detect(summaries$redlistCriteria, "[a]")
-summaries$c <- str_detect(summaries$redlistCriteria, "[c]")
+
+summaries$Bac <- str_detect(summaries$redlistCriteria, "^B.a.*?c") ##any that start with B, followed by
+## any character, followed by a. *?c means anything in between, then c
+
 
 
 ## -------------- Spp which need threat abatement AND emergency actions -------------------####
 
 suma <- summaries
 
-suma <- filter(suma, D == TRUE | C2ai == TRUE |
-                 C == TRUE & redlistCategory == "Critically Endangered" |
-                 B == TRUE & a == TRUE & c == TRUE)
-
-suma %>% group_by(C, C2ai, D, B) %>%  count()
-
-suma %>% select(scientificName) %>% unique() %>% nrow() /nrow(summaries) * 100
+suma <- filter(suma, Bac == TRUE | C == TRUE & redlistCategory == "Critically Endangered" |
+                 C2ai == TRUE | D1 == TRUE & redlistCategory == "Vulnerable" |
+                 D == TRUE & redlistCategory %in% c("Critically Endangered", "Endangered"))
 
 
+## Check counts: 
+
+
+suma %>% select(scientificName) %>% unique() %>% nrow() / nspp * 100
+
+
+
+suma %>% 
+  group_by(redlistCategory, B, C, C2ai, D) %>% 
+  count() %>% 
+  gather(-redlistCategory, -n, key = "crit", value = "TF") %>% 
+  filter(TF == TRUE) %>% 
+  ggplot(aes(x = redlistCategory, y = n, fill = crit)) +
+  geom_col()
 
 ## Check taxonomy of those spp:
 
