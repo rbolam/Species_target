@@ -78,8 +78,21 @@ threats %>%
 ## ------------------- Identifying spp which need emergency actions ------------------------####
 
 
+## Sort out mature individuals data:
+
+mature <- read.csv("data/all_other_fields.csv", na.string = c("", "U", "NA"))
+
+## Remove middle values:
+mature <- separate(mature, PopulationSize.range, sep = ",", into = "PopulationSize.range")
+
+## Make col of low and high pop estimate:
+mature <- separate(mature, PopulationSize.range, sep = "-", into = c("low", "high"))
+mature$low <- as.numeric(mature$low)
+
+
+
 summaries <- read.csv("data/simple_summaries.csv")
-mature <- read.csv("data/all_other_fields.csv")
+
 
 summaries <- full_join(summaries, mature, by = "scientificName")
 
@@ -87,7 +100,7 @@ summaries <- full_join(summaries, mature, by = "scientificName")
 
 summaries <- summaries %>% 
   select(scientificName, kingdomName, phylumName, className, redlistCategory, 
-         redlistCriteria, PopulationSize.range) %>% 
+         redlistCriteria, low) %>% 
   separate_rows(redlistCriteria, sep = ";") %>% 
   filter(!is.na(redlistCriteria))
 
@@ -108,8 +121,6 @@ summaries$Bac <- str_detect(summaries$redlistCriteria, "^B.a.*?c") ##any that st
 ## followed by any character, followed by a. *?c means anything in between, then c
 
 
-## Deal with mature individuals data:
-summaries <- separate(summaries, PopulationSize.range, sep = "-", into = c("lowpop", "highpop"))
 
 
 ## -------------- Spp which need threat abatement AND emergency actions -------------------####
@@ -118,11 +129,14 @@ suma <- summaries
 
 suma <- filter(suma, Bac == TRUE | C == TRUE & redlistCategory == "Critically Endangered" |
                  C2ai == TRUE | D1 == TRUE & redlistCategory == "Vulnerable" |
-                 D == TRUE & redlistCategory %in% c("Critically Endangered", "Endangered"))
+                 D == TRUE & redlistCategory %in% c("Critically Endangered", "Endangered") |
+                 low <= 1000)
 
-
+## Percent of spp that need threat abatement and emergency actions, of all threatened + EW spp:
 suma %>% select(scientificName) %>% unique() %>% nrow() / nspp * 100
 
+## Percent of spp that need threat abatement and emergency actions, of all spp:
+suma %>% select(scientificName) %>% unique() %>% nrow() / 36602 * 100
 
 
 suma %>% 
