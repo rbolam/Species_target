@@ -132,6 +132,25 @@ suma <- filter(suma, Bac == TRUE | C == TRUE & redlistCategory == "Critically En
                  D == TRUE & redlistCategory %in% c("Critically Endangered", "Endangered") |
                  low <= 1000)
 
+
+## Spp listed under Bac for checking:
+
+suma %>% 
+  filter(Bac == TRUE) %>% 
+  select(scientificName, redlistCategory, redlistCriteria)
+
+sppretain <- c("Turnix olivii", "Nothofagus alessandrii", "Pteropus rodricensis", 
+               "Aproteles bulmerae", "Otomys barbouri", "Lepus flavigularis", "Capensibufo rosei",
+               "Arthroleptella rugosa", "Pseudomys australis", "Urocitellus endemicus")
+sppremove <- c("Acrocephalus familiaris", "Anas laysanensis", "Telespiza ultima", "Alauda razae",
+               "Mimus trifasciatus", "Megadyptes antipodes", "Spheniscus mendiculus", 
+               "Montipora dilatata", "Pediocactus paradinei", "Peromyscus dickeyi", 
+               "Mannophryne cordilleriana", "Peromyscus stephani", "Mammillaria schwarzii",
+               "Pediocactus knowltonii", "Sylvilagus robustus")
+
+suma <- filter(suma, !scientificName %in% sppremove)
+
+
 ## Percent of spp that need threat abatement and emergency actions, of all threatened + EW spp:
 suma %>% select(scientificName) %>% unique() %>% nrow() / nspp * 100
 
