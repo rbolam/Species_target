@@ -44,8 +44,22 @@ thr_str %>%
   unique() %>% 
   count(redlistCategory) %>% 
   mutate(perc = n / 2049 * 100) ## 2049 is no of spp
-    
-  
+
+
+## Count spp not benefitting from targets:
+spp_miss <- thr_str %>% 
+  filter(is.na(target)) %>% 
+  select(scientificName) %>% 
+  unique()
+
+thr_str %>% 
+  filter(scientificName %in% spp_miss$scientificName) %>% 
+  select(scientificName, target) #%>% 
+  unique() %>% 
+  count(scientificName) %>% 
+  filter(n == 1) %>% 
+  nrow()
+
 
 
 ## Percent of spp benefitting from different actions:
