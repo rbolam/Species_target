@@ -36,6 +36,18 @@ thr_str %>%
   arrange(-n)
 
 
+## Percent of spp in each RL category that would be affected by threats not tackled:
+thr_str %>% 
+  filter(is.na(target)) %>% 
+  left_join(summaries, by = "scientificName") %>% 
+  select(scientificName, redlistCategory) %>% 
+  unique() %>% 
+  count(redlistCategory) %>% 
+  mutate(perc = n / 2049 * 100) ## 2049 is no of spp
+    
+  
+
+
 ## Percent of spp benefitting from different actions:
 act <- read.csv("data/actions_needed_tidy.csv")
 act %>% 
