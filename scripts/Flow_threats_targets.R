@@ -352,29 +352,29 @@ summaries <- left_join(summaries, countries, by = "scientificName")
 
 summaries %>% 
   filter(spptar == "yes") %>% 
-  select(scientificName, name) %>% 
+  select(scientificName, region) %>% 
   unique() %>% 
-  count(name, name = "n_tar") ->
+  count(region, name = "n_tar") ->
   n_tar
 
 summaries %>% 
   filter(sppthract == "yes") %>% 
-  select(scientificName, name) %>% 
+  select(scientificName, region) %>% 
   unique() %>% 
-  count(name, name = "n_thract") ->
+  count(region, name = "n_thract") ->
   n_thract
 
 summaries %>% 
   filter(sppact == "yes") %>% 
-  select(scientificName, name) %>% 
+  select(scientificName, region) %>% 
   unique() %>% 
-  count(name, name = "n_act") ->
+  count(region, name = "n_act") ->
   n_act
 
 spp_cou <- n_tar %>% 
-  full_join(n_thract, by = "name") %>% 
-  full_join(n_act, by = "name") %>% 
-  replace_na(list(n_tar = 0, n_thract = 0, n_act = 0)) %>% 
+  full_join(n_thract, by = "region") %>% 
+  full_join(n_act, by = "region") %>% 
+  replace_na(list(n_tar = 0, n_thract = 0, n_act = 0))# %>% 
   rename(region = name)
 
 
