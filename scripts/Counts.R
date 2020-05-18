@@ -139,6 +139,9 @@ suma %>%
   filter(Bac == TRUE) %>% 
   select(scientificName, redlistCategory, redlistCriteria)
 
+
+## Manual check of which spp to retain:
+
 sppretain <- c("Turnix olivii", "Nothofagus alessandrii", "Pteropus rodricensis", 
                "Aproteles bulmerae", "Otomys barbouri", "Lepus flavigularis", "Capensibufo rosei",
                "Arthroleptella rugosa", "Pseudomys australis", "Urocitellus endemicus")
