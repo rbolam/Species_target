@@ -18,6 +18,7 @@ nspp / 36602 *100  ## calculate % of all spp that are threatened + EW
 thr_str <- read.csv("data/spp_tar.csv")
 thr_str %>% 
   select(scientificName, thr_lev1name) %>% 
+  filter(thr_lev1name != "Geological events") %>% ## remove Geol events as can't be mitigated
   unique() %>% 
   count(thr_lev1name) %>% 
   mutate(perc1 = n / nspp * 100) %>% ## calculate % of threatened/EW spp
@@ -26,8 +27,8 @@ thr_str %>%
 
 
 ## Percent/Count spp benefitting from each target:
-thr_str <- read.csv("data/spp_tar.csv")
 thr_str %>% 
+  filter(thr_lev1name != "Geological events") %>% ## remove Geol events as can't be mitigated
   select(scientificName, target) %>% 
   unique() %>% 
   count(target) %>% 
@@ -38,12 +39,13 @@ thr_str %>%
 
 ## Percent of spp in each RL category that would be affected by threats not tackled:
 thr_str %>% 
+  filter(thr_lev1name != "Geological events") %>% ## remove Geol events as can't be mitigated
   filter(is.na(target)) %>% 
   left_join(summaries, by = "scientificName") %>% 
   select(scientificName, redlistCategory) %>% 
   unique() %>% 
   count(redlistCategory) %>% 
-  mutate(perc = n / 2049 * 100) ## 2049 is no of spp
+  mutate(perc = n / 1977 * 100) ## 2049 is no of spp
 
 
 ## Count spp not benefitting from targets:
