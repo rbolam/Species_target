@@ -216,76 +216,10 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
   theme_classic() +
   theme(legend.position = "none",
         text = element_text(size = 9),
-        axis.ticks.x = element_blank())
+        axis.ticks.x = element_blank()) ->
+  a
 
-ggsave("figures/flow_option2.png", width = 7, height = 5, dpi = 600) 
-
-
-
-ggplot(b, aes(x = fct_rev(target), y = n, fill = target)) + 
-  geom_col() +
-  scale_fill_manual(values = c("#053061", "#053061", "#053061", "#053061","#053061", "#d6604d")) +
-  scale_x_discrete(labels = c("Threats not addressed\nby target",
-                              "Target 6\nClimate change",
-                              "Target 5\nHarvesting & trade",
-                              "Target 4\nPollution",
-                              "Target 3\nInvasive species",
-                              "Target 1 & 2\nEcosystems &\nprotected areas")) +
-  labs(x = "Zero Draft Target", y = "Number of species") +
-  coord_flip() +
-  theme_classic() +
-  theme(legend.position = "none",
-        text = element_text(size = 9)) ->
-  plota
-  
-
-
-
-
-
-
-threats <- read.csv("data/spp_tar.csv")
-
-### Remove threat Geological events as they cannot be addressed by conservation action/policy
-threats <- threats %>% 
-  filter(!thr_lev2 %in% c(10.1, 10.2, 10.3)) %>% 
-  select(scientificName, thr_lev1name, target) %>% 
-  unique()
-
-c <- threats %>% group_by(thr_lev1name, target) %>% count()# %>% 
-  #gather("type", "value", 1:2)
-
-c$target[is.na(c$target)] <- "Not addressed by targets"  
-
-ord <- c %>% 
-  group_by(thr_lev1name) %>% 
-  summarise(ord = sum(n))
-
-c <- left_join(c, ord, by = "thr_lev1name")
-
-c$thr_lev1name[c$thr_lev1name == "Invasive & other problematic species, genes & diseases"] <-
-  c("Invasive & other problematic\nspecies, genes and diseases")
-
-ggplot(c, aes(x = fct_reorder(thr_lev1name, ord), y = n, fill = target)) +
-  geom_col() +
-  coord_flip() +
-  scale_fill_manual(values = c("#d6604d", "#053061", "#2166ac","#4393c3", "#92c5de","#d1e5f0"), 
-                    name = "Zero Draft Targets",
-                    labels = c("Not addressed\nby targets", 
-                               "Target 1 & 2\nEcosystems &\nprotected areas",
-                               "Target 3\nInvasive species", 
-                               "Target 4\nPollution", 
-                               "Target 5\nHarvesting & trade", 
-                               "Target 6\nClimate change")) +
-  labs(x = "Threat", y = "Number of species") +
-  theme_classic() +
-  theme(legend.position = c(0.8, 0.4),
-        text = element_text(size = 9)) ->
-  plotb
-
-c <- grid.arrange(plotb, plota, nrow = 1)
-ggsave("figures/option3.jpg", c, )
-
+#ggsave("figures/flow_option2.png", width = 7, height = 5, dpi = 600) 
 
 
 
@@ -326,19 +260,15 @@ sppthract <- read.csv("data/spp_needing_thr_aba_act.csv")
 sppthract$sppthract <- "yes"
 
 
-## Spp that need actions only:
 
-sppact <- read.csv("data/spp_needing_act.csv") 
-sppact$sppact <- "yes"
-
-
+## Summary of all spp that need an additional spp target:
 
 summaries <- read.csv("data/simple_summaries.csv")
 
 summaries <- summaries %>% 
   left_join(spptar, by = "scientificName") %>% 
   left_join(sppthract, by = "scientificName") %>% 
-  left_join(sppact, by = "scientificName")
+  filter(spptar == "yes" | sppthract == "yes")
 
 
 
@@ -407,36 +337,7 @@ ggplot() +
   theme_void() +
   theme(text = element_text(size = 7),
         legend.key.size = unit(0.4, "cm")) ->
-  a
-
-ggplot() + 
-  geom_map(data = map.all, map = map.all, 
-           aes(map_id = region, x = long, y = lat, fill = n_thract), colour = "black", size = 0.1) + 
-  scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "N") +
-  #coord_proj("+proj=cea +lat_ts=37.5") +
-  labs(tag = "", x = "", y = "", title = "Species which need species-specific actions") + 
-  guides(colour = "none") +
-  theme_void() +
-  theme(text = element_text(size = 7),
-        legend.key.size = unit(0.4, "cm")) ->
   b
-
-ggplot() + 
-  geom_map(data = map.all, map = map.all, 
-           aes(map_id = region, x = long, y = lat, fill = n_act), colour = "black", size = 0.1) + 
-  scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "N") +
-  #coord_proj("+proj=cea +lat_ts=37.5") +
-  labs(tag = "", x = "", y = "", title = "Species which need species-specific actions only") + 
-  guides(colour = "none") +
-  theme_void() +
-  theme(text = element_text(size = 7),
-        legend.key.size = unit(0.4, "cm")) ->
-  c
-
-
-
-d <- grid.arrange(a, b, c, ncol = 1)
-ggsave("figures/map_options.jpg", d, width = 4, height = 8)
 
 c <- ggdraw() +
   draw_plot(a) +
