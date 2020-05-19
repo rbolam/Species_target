@@ -6,7 +6,7 @@ library(ggalluvial)
 library(viridis)
 library(rworldmap)
 library(ggalt)
-library(gridExtra)
+library(cowplot)
 
 ## --------------------------- Sort data --------------------------####
 threats <- read.csv("data/spp_tar.csv")
@@ -194,21 +194,21 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
            fill = "grey90", alpha = 0.9, colour = NA) +
   
   ## Add labels:
-  geom_text(stat = "stratum", infer.label = FALSE, size = 2, fontface = "bold",  
+  geom_text(stat = "stratum", infer.label = FALSE, size = 1.6, fontface = "bold",  
             colour = c(rep("grey10", 4), rep("grey90", 4), rep("grey10", 5), "grey90"),
             label = c("Other (2,055)", 
                       "Climate change & severe\nweather (1,339)",
                       "Pollution (1,472)", 
-                      "Natural system modifications\n(1,517)", 
-                      "Invasive & other problematic\nspecies (1,926)", 
+                      "Natural system\nmodifications (1,517)", 
+                      "Invasive & other pro-\nblematic species (1,926)", 
                       "Residential & commercial\ndevelopment (2,321)", 
                       "Agriculture & aquaculture\n(4,447)", 
-                      "Biological resource use (4,596)", 
-                      "Target 6 - Climate change\n(1,339)", 
-                      "Target 5 - Harvesting & trade\n(4,596)", 
-                      "Target 4 - Pollution (1,472)", 
-                      "Target 3 - Invasive species\n(1,695)", 
-                      "Target 1 & 2 - Ecosystems &\nprotected areas (6,058)",
+                      "Biological resource use\n(4,596)", 
+                      "Target 6 - Climate\nchange (1,339)", 
+                      "Target 5 - Harvesting &\ntrade (4,596)", 
+                      "Target 4 - Pollution\n(1,472)", 
+                      "Target 3 - Invasive\nspecies (1,695)", 
+                      "Target 1 & 2 -\nEcosystems & protected\nareas (6,058)",
                       "Not addressed by targets\n(1,977)")) +
   scale_x_discrete(limits = c("Threat", "Post-2020 Framework"), name = "", expand = c(.001, 0)) + 
   scale_y_continuous(name = "Number of species", expand = c(0.001, 0)) + 
@@ -216,7 +216,8 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
   theme_classic() +
   theme(legend.position = "none",
         text = element_text(size = 9),
-        axis.ticks.x = element_blank()) ->
+        axis.ticks.x = element_blank(),
+        plot.margin = unit(c(0, 0.2, -0.3, 0.3), "cm")) ->
   a
 
 #ggsave("figures/flow_option2.png", width = 7, height = 5, dpi = 600) 
@@ -288,37 +289,14 @@ countries <- countries %>%
   select(-name) %>% 
   unique()
 
+
+## Merge w relevant spp and count:
 summaries <- left_join(summaries, countries, by = "scientificName")
+spp_cou <- count(summaries, region)
 
 
-## Count no of spp in different groups:
 
-summaries %>% 
-  filter(spptar == "yes") %>% 
-  select(scientificName, region) %>% 
-  unique() %>% 
-  count(region, name = "n_tar") ->
-  n_tar
-
-summaries %>% 
-  filter(sppthract == "yes") %>% 
-  select(scientificName, region) %>% 
-  unique() %>% 
-  count(region, name = "n_thract") ->
-  n_thract
-
-summaries %>% 
-  filter(sppact == "yes") %>% 
-  select(scientificName, region) %>% 
-  unique() %>% 
-  count(region, name = "n_act") ->
-  n_act
-
-spp_cou <- n_tar %>% 
-  full_join(n_thract, by = "region") %>% 
-  full_join(n_act, by = "region") %>% 
-  replace_na(list(n_tar = 0, n_thract = 0, n_act = 0))# %>% 
-  rename(region = name)
+## Map
 
 
 map.all <- map_data(map = "world")
@@ -329,27 +307,21 @@ map.all <- full_join(map.all, spp_cou, by = "region")
 
 ggplot() + 
   geom_map(data = map.all, map = map.all, 
-           aes(map_id = region, x = long, y = lat, fill = n_tar), colour = "black", size = 0.1) + 
+           aes(map_id = region, x = long, y = lat, fill = n), colour = "black", size = 0.3) + 
   scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "N") +
-  #coord_proj("+proj=cea +lat_ts=37.5") +
-  labs(tag = "", x = "", y = "", title = "Species with threats not addressed by targets") + 
+  coord_proj("+proj=cea +lat_ts=37.5") +
+  labs(tag = "", x = "", y = "") + 
   guides(colour = "none") +
   theme_void() +
   theme(text = element_text(size = 7),
-        legend.key.size = unit(0.4, "cm")) ->
+        legend.key.size = unit(0.4, "cm"),
+        plot.margin = unit(c(0, 0, 0, 0.5), "cm")) ->
   b
 
-c <- ggdraw() +
-  draw_plot(a) +
-  draw_text("A", x = 0.02, y = 0.98)
 
-d <- ggdraw() +
-  draw_plot(b) +
-  draw_text("B", x = 0.02, y = 0.98)
+plot_grid(a, b, ncol = 1, labels = "AUTO", rel_heights = c(1.5, 1))
 
-e <- grid.arrange(c, d)
-
-ggsave("figures/figure1.png", e, width = 12, height = 15, unit = "cm", dpi = 300)
+ggsave("figures/figure1.png", width = 12, height = 15, unit = "cm", dpi = 300)
 
 
 map.all %>% 
