@@ -78,24 +78,32 @@ ggsave("figures/flow_option1.png", width = 7, height = 5, dpi = 600)
 
 ## ------------------------------- Option 2 -------------------------------####
 
+
+## Set coordinates for polygons:
 x <- c(1, 1, 1.124, 1.124)
 
 
+## Number of spp-threat combinations in each target:
 threats_summ %>% 
   group_by(target) %>% 
   summarise(all = sum(n)) ->
   tar_all
 
+
+## Number of spp benefitting from each target:
 threats %>% 
   select(scientificName, target) %>% 
   unique() %>% 
   count(target) ->
   tar_n
 
+
+## Calculate difference:
 tar <- full_join(tar_all, tar_n, by = "target")
 tar <- mutate(tar, double = all - n)
 
-# Calculate values
+
+# Calculate other values
 ## Spp not addressed by targets:
 sum(tar$all) - tar[6,2] + (tar[6,4]/2) #top of rectangle
 sum(tar$all) - (tar[6,4]/2) #bottom of rectangle
@@ -109,17 +117,22 @@ sum(tar$all) - tar[6,2] #top of polygon
 sum(tar$all) - tar[6,2] - tar[1,2] #bottom of polygon
 
 
+## Calculate no of spp in each threat (by target - some double counted):
 threats_summ %>% 
   group_by(thr_lev1name) %>% 
   summarise(all = sum(n)) ->
   thr_all
 
+
+## Calculate no of spp in each threat uniquely:
 threats %>% 
   select(scientificName, thr_lev1name) %>% 
   unique() %>% 
   count(thr_lev1name) ->
   thr_n
 
+
+##Merge and calculate difference:
 thr <- thr_all %>% 
   full_join(thr_n, by = "thr_lev1name") %>% 
   mutate(double = all - n)
