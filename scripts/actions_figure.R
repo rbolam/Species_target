@@ -27,7 +27,7 @@ actions %>%
   ggplot(aes(x = fct_rev(fct_infreq(name)), fill = redlistCategory)) +
   geom_bar() +
   coord_flip(ylim = c(0, 4000)) +
-  scale_fill_manual(values = c("#F0E442", "#E69F00", "#D55E00"), 
+  scale_fill_manual(values = c("#fecc5c", "#fd8d3c", "#e31a1c"), 
                     name = "IUCN Red List\nCategory") +
   scale_y_continuous(expand = c(0.001, 0)) + 
   theme_classic() +
