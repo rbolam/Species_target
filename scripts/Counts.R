@@ -13,9 +13,16 @@ nspp / 36602 *100  ## calculate % of all spp that are threatened + EW
 ## ----------------------- Counts threats, targets, actions --------------------------------####
 
 
+## Percent of spp with at least one threat listed:
+thr_str <- read.csv("data/spp_tar.csv")
+thr_str %>% 
+  select(scientificName) %>% 
+  unique() %>% 
+  nrow() / nrow(summaries) * 100
+
+
 ## Count spp threatened by each threat (level 1):
 
-thr_str <- read.csv("data/spp_tar.csv")
 thr_str %>% 
   select(scientificName, thr_lev1name) %>% 
   filter(thr_lev1name != "Geological events") %>% ## remove Geol events as can't be mitigated
