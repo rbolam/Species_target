@@ -9,6 +9,8 @@ summaries <- read.csv("data/simple_summaries.csv")
 nspp <- summaries %>% select(scientificName) %>% unique() %>% nrow()
 nspp / 36602 *100  ## calculate % of all spp that are threatened + EW
 
+summaries %>% count(className) ## count no in each class
+
 
 ## ----------------------- Counts threats, targets, actions --------------------------------####
 
@@ -73,7 +75,7 @@ spp_miss <- thr_str %>%
 
 thr_str %>% 
   filter(scientificName %in% spp_miss$scientificName) %>% 
-  select(scientificName, target) #%>% 
+  select(scientificName, target) %>% 
   unique() %>% 
   count(scientificName) %>% 
   filter(n == 1) %>% 
