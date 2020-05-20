@@ -282,11 +282,13 @@ countriesmatch <- read.csv("data/countrymatching.csv")
 
 countries <- countries %>% 
   filter(origin %in% c("Native", "Reintroduced")) %>% 
-  filter(presence %in% c("Extant", "Possibly Extant", "Presence Uncertain")) %>% 
+  filter(presence %in% c("Extant", "Possibly Extant", "Presence Uncertain", 
+                         "Possibly Extinct")) %>% 
   select(scientificName, name) %>% 
   unique() %>% 
   full_join(countriesmatch, by = "name") %>% 
   select(-name) %>% 
+  filter(!is.na(region)) %>% 
   unique()
 
 
@@ -302,7 +304,7 @@ spp_cou <- count(summaries, region)
 map.all <- map_data(map = "world")
 map.all <- full_join(map.all, spp_cou, by = "region") 
 
-
+map.all %>% select(region, n) %>%  unique() %>% arrange(-n)
 
 
 ggplot() + 
