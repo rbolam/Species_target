@@ -30,7 +30,7 @@ thr %>%
   #nrow() 
   filter(is.na(stressCode)) %>% 
   nrow()
-(33986 - 1021) / 33986 * 100
+(33984 - 1003) / 33984 * 100
 
 
 ## Count spp threatened by each threat (level 1):
@@ -129,7 +129,7 @@ threats %>%
 
 mature <- read.csv("data/all_other_fields.csv", na.string = c("", "U", "NA"))
 
-## Remove middle values:
+## Remove median values:
 mature <- separate(mature, PopulationSize.range, sep = ",", into = "PopulationSize.range")
 
 ## Make col of low and high pop estimate:
