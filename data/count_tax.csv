@@ -1,0 +1,19 @@
+className,n,rlName,n2,Difference
+AVES,2720,Birds,only includes threatened,NA
+GNETOPSIDA,97,Gnetopsida,0,97
+MAMMALIA,5851,Mammals,5769,82
+MYXINI,76,Hagfishes,0,76
+AMPHIBIA,6824,Amphibians,6791,33
+MALACOSTRACA,2885,Selected crustaceans,2878,7
+SARCOPTERYGII,7,Coelacanths & Lungfish,0,7
+MEROSTOMATA,4,Horseshoe crabs,0,4
+REPTILIA,342,Selected reptiles,339,3
+MAGNOLIOPSIDA,2248,Selected dicots,2247,1
+ACTINOPTERYGII,3131,Bony fishes,3131,0
+ANTHOZOA + HYDROZOA,845,Reef-forming corals,845,0
+CEPHALOPODA,750,Cephalopods,750,0
+CHONDRICHTHYES,1124,"Sharks, rays, chimeras",1124,0
+CYCADOPSIDA,307,Cycads,307,0
+GASTROPODA,633,Selected gastropods,633,0
+PINOPSIDA,610,Conifers,610,0
+,28454,,25424,

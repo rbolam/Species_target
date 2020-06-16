@@ -1,0 +1,178 @@
+thr_lev2,thr_lev2name,stressName,target
+1.1,Housing & urban areas,Indirect species effects,NA
+1.1,Housing & urban areas,Species disturbance,NA
+1.1,Housing & urban areas,Species mortality,NA
+1.2,Commercial & industrial areas,Indirect species effects,NA
+1.2,Commercial & industrial areas,Species disturbance,NA
+1.2,Commercial & industrial areas,Species mortality,NA
+1.3,Tourism & recreation areas,Indirect species effects,NA
+1.3,Tourism & recreation areas,Species disturbance,NA
+1.3,Tourism & recreation areas,Species mortality,NA
+2.1,Annual & perennial non-timber crops,Indirect species effects,NA
+2.1,Annual & perennial non-timber crops,Species disturbance,NA
+2.1,Annual & perennial non-timber crops,Species mortality,NA
+2.2,Wood & pulp plantations,Indirect species effects,NA
+2.2,Wood & pulp plantations,Species disturbance,NA
+2.2,Wood & pulp plantations,Species mortality,NA
+2.3,Livestock farming & ranching,Indirect species effects,NA
+2.3,Livestock farming & ranching,Species disturbance,NA
+2.3,Livestock farming & ranching,Species mortality,NA
+2.4,Marine & freshwater aquaculture,Indirect species effects,NA
+2.4,Marine & freshwater aquaculture,Species disturbance,NA
+2.4,Marine & freshwater aquaculture,Species mortality,NA
+3.1,Oil & gas drilling,Indirect species effects,NA
+3.1,Oil & gas drilling,Species disturbance,NA
+3.1,Oil & gas drilling,Species mortality,NA
+3.2,Mining & quarrying,Indirect species effects,NA
+3.2,Mining & quarrying,Species disturbance,NA
+3.2,Mining & quarrying,Species mortality,NA
+3.3,Renewable energy,Indirect species effects,NA
+3.3,Renewable energy,Species disturbance,NA
+3.3,Renewable energy,Species mortality,NA
+4.1,Roads & railroads,Indirect species effects,NA
+4.1,Roads & railroads,Species disturbance,NA
+4.1,Roads & railroads,Species mortality,NA
+4.2,Utility & service lines,Indirect species effects,NA
+4.2,Utility & service lines,Species disturbance,NA
+4.2,Utility & service lines,Species mortality,NA
+4.3,Shipping lanes,Indirect species effects,NA
+4.3,Shipping lanes,Species disturbance,NA
+4.3,Shipping lanes,Species mortality,NA
+4.4,Flight paths,Species disturbance,NA
+4.4,Flight paths,Species mortality,NA
+6.1,Recreational activities,Indirect species effects,NA
+6.1,Recreational activities,Species disturbance,NA
+6.1,Recreational activities,Species mortality,NA
+6.2,"War, civil unrest & military exercises",Indirect species effects,NA
+6.2,"War, civil unrest & military exercises",Species disturbance,NA
+6.2,"War, civil unrest & military exercises",Species mortality,NA
+6.3,Work & other activities,Indirect species effects,NA
+6.3,Work & other activities,Species disturbance,NA
+6.3,Work & other activities,Species mortality,NA
+7.1,Fire & fire suppression,Indirect species effects,NA
+7.1,Fire & fire suppression,Species disturbance,NA
+7.1,Fire & fire suppression,Species mortality,NA
+7.2,Dams & water management/use,Indirect species effects,NA
+7.2,Dams & water management/use,Species disturbance,NA
+7.2,Dams & water management/use,Species mortality,NA
+7.3,Other ecosystem modifications,Indirect species effects,NA
+7.3,Other ecosystem modifications,Species disturbance,NA
+7.3,Other ecosystem modifications,Species mortality,NA
+8.2,Problematic native species/diseases,Indirect species effects,NA
+8.2,Problematic native species/diseases,Species disturbance,NA
+8.2,Problematic native species/diseases,Species mortality,NA
+8.3,Introduced genetic material,Indirect species effects,NA
+8.3,Introduced genetic material,Species disturbance,NA
+8.4,Problematic species/diseases of unknown origin,Indirect species effects,NA
+8.4,Problematic species/diseases of unknown origin,Species disturbance,NA
+8.4,Problematic species/diseases of unknown origin,Species mortality,NA
+8.5,Viral/prion-induced diseases,Indirect species effects,NA
+8.5,Viral/prion-induced diseases,Species disturbance,NA
+8.5,Viral/prion-induced diseases,Species mortality,NA
+8.6,Diseases of unknown cause,Indirect species effects,NA
+8.6,Diseases of unknown cause,Species mortality,NA
+10.1,Volcanoes,Ecosystem stresses,NA
+10.1,Volcanoes,Indirect species effects,NA
+10.1,Volcanoes,Species disturbance,NA
+10.1,Volcanoes,Species mortality,NA
+10.2,Earthquakes/tsunamis,Ecosystem stresses,NA
+10.2,Earthquakes/tsunamis,Species mortality,NA
+10.3,Avalanches/landslides,Ecosystem stresses,NA
+10.3,Avalanches/landslides,Indirect species effects,NA
+10.3,Avalanches/landslides,Species disturbance,NA
+10.3,Avalanches/landslides,Species mortality,NA
+12.1,Other threat,Indirect species effects,NA
+12.1,Other threat,Species disturbance,NA
+12.1,Other threat,Species mortality,NA
+1.1,Housing & urban areas,Ecosystem stresses,Target 1 & 2
+1.2,Commercial & industrial areas,Ecosystem stresses,Target 1 & 2
+1.3,Tourism & recreation areas,Ecosystem stresses,Target 1 & 2
+2.1,Annual & perennial non-timber crops,Ecosystem stresses,Target 1 & 2
+2.2,Wood & pulp plantations,Ecosystem stresses,Target 1 & 2
+2.3,Livestock farming & ranching,Ecosystem stresses,Target 1 & 2
+2.4,Marine & freshwater aquaculture,Ecosystem stresses,Target 1 & 2
+3.1,Oil & gas drilling,Ecosystem stresses,Target 1 & 2
+3.2,Mining & quarrying,Ecosystem stresses,Target 1 & 2
+3.3,Renewable energy,Ecosystem stresses,Target 1 & 2
+4.1,Roads & railroads,Ecosystem stresses,Target 1 & 2
+4.2,Utility & service lines,Ecosystem stresses,Target 1 & 2
+4.3,Shipping lanes,Ecosystem stresses,Target 1 & 2
+4.4,Flight paths,Ecosystem stresses,Target 1 & 2
+5.1,Hunting & collecting terrestrial animals,Ecosystem stresses,Target 1 & 2
+5.2,Gathering terrestrial plants,Ecosystem stresses,Target 1 & 2
+5.3,Logging & wood harvesting,Ecosystem stresses,Target 1 & 2
+5.4,Fishing & harvesting aquatic resources,Ecosystem stresses,Target 1 & 2
+6.1,Recreational activities,Ecosystem stresses,Target 1 & 2
+6.2,"War, civil unrest & military exercises",Ecosystem stresses,Target 1 & 2
+6.3,Work & other activities,Ecosystem stresses,Target 1 & 2
+7.1,Fire & fire suppression,Ecosystem stresses,Target 1 & 2
+7.2,Dams & water management/use,Ecosystem stresses,Target 1 & 2
+7.3,Other ecosystem modifications,Ecosystem stresses,Target 1 & 2
+8.2,Problematic native species/diseases,Ecosystem stresses,Target 1 & 2
+8.4,Problematic species/diseases of unknown origin,Ecosystem stresses,Target 1 & 2
+8.5,Viral/prion-induced diseases,Ecosystem stresses,Target 1 & 2
+8.6,Diseases of unknown cause,Ecosystem stresses,Target 1 & 2
+12.1,Other threat,Ecosystem stresses,Target 1 & 2
+8.1,Invasive non-native/alien species/diseases,Ecosystem stresses,Target 3
+8.1,Invasive non-native/alien species/diseases,Indirect species effects,Target 3
+8.1,Invasive non-native/alien species/diseases,Species disturbance,Target 3
+8.1,Invasive non-native/alien species/diseases,Species mortality,Target 3
+9.1,Domestic & urban waste water,Ecosystem stresses,Target 4
+9.1,Domestic & urban waste water,Indirect species effects,Target 4
+9.1,Domestic & urban waste water,Species disturbance,Target 4
+9.1,Domestic & urban waste water,Species mortality,Target 4
+9.2,Industrial & military effluents,Ecosystem stresses,Target 4
+9.2,Industrial & military effluents,Indirect species effects,Target 4
+9.2,Industrial & military effluents,Species disturbance,Target 4
+9.2,Industrial & military effluents,Species mortality,Target 4
+9.3,Agricultural & forestry effluents,Ecosystem stresses,Target 4
+9.3,Agricultural & forestry effluents,Indirect species effects,Target 4
+9.3,Agricultural & forestry effluents,Species disturbance,Target 4
+9.3,Agricultural & forestry effluents,Species mortality,Target 4
+9.4,Garbage & solid waste,Ecosystem stresses,Target 4
+9.4,Garbage & solid waste,Indirect species effects,Target 4
+9.4,Garbage & solid waste,Species disturbance,Target 4
+9.4,Garbage & solid waste,Species mortality,Target 4
+9.5,Air-borne pollutants,Ecosystem stresses,Target 4
+9.5,Air-borne pollutants,Indirect species effects,Target 4
+9.5,Air-borne pollutants,Species mortality,Target 4
+9.6,Excess energy,Ecosystem stresses,Target 4
+9.6,Excess energy,Indirect species effects,Target 4
+9.6,Excess energy,Species disturbance,Target 4
+9.6,Excess energy,Species mortality,Target 4
+5.1,Hunting & collecting terrestrial animals,Ecosystem stresses,Target 5
+5.1,Hunting & collecting terrestrial animals,Indirect species effects,Target 5
+5.1,Hunting & collecting terrestrial animals,Species disturbance,Target 5
+5.1,Hunting & collecting terrestrial animals,Species mortality,Target 5
+5.2,Gathering terrestrial plants,Ecosystem stresses,Target 5
+5.2,Gathering terrestrial plants,Indirect species effects,Target 5
+5.2,Gathering terrestrial plants,Species disturbance,Target 5
+5.2,Gathering terrestrial plants,Species mortality,Target 5
+5.3,Logging & wood harvesting,Ecosystem stresses,Target 5
+5.3,Logging & wood harvesting,Indirect species effects,Target 5
+5.3,Logging & wood harvesting,Species disturbance,Target 5
+5.3,Logging & wood harvesting,Species mortality,Target 5
+5.4,Fishing & harvesting aquatic resources,Ecosystem stresses,Target 5
+5.4,Fishing & harvesting aquatic resources,Indirect species effects,Target 5
+5.4,Fishing & harvesting aquatic resources,Species disturbance,Target 5
+5.4,Fishing & harvesting aquatic resources,Species mortality,Target 5
+11.1,Habitat shifting & alteration,Ecosystem stresses,Target 6
+11.1,Habitat shifting & alteration,Indirect species effects,Target 6
+11.1,Habitat shifting & alteration,Species disturbance,Target 6
+11.1,Habitat shifting & alteration,Species mortality,Target 6
+11.2,Droughts,Ecosystem stresses,Target 6
+11.2,Droughts,Indirect species effects,Target 6
+11.2,Droughts,Species disturbance,Target 6
+11.2,Droughts,Species mortality,Target 6
+11.3,Temperature extremes,Ecosystem stresses,Target 6
+11.3,Temperature extremes,Indirect species effects,Target 6
+11.3,Temperature extremes,Species disturbance,Target 6
+11.3,Temperature extremes,Species mortality,Target 6
+11.4,Storms & flooding,Ecosystem stresses,Target 6
+11.4,Storms & flooding,Indirect species effects,Target 6
+11.4,Storms & flooding,Species disturbance,Target 6
+11.4,Storms & flooding,Species mortality,Target 6
+11.5,Other impacts,Ecosystem stresses,Target 6
+11.5,Other impacts,Indirect species effects,Target 6
+11.5,Other impacts,Species disturbance,Target 6
+11.5,Other impacts,Species mortality,Target 6

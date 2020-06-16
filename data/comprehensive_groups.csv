@@ -1,0 +1,89 @@
+Group,tax1,group1,tax2,group2
+Amphibians,Class,AMPHIBIA,NA,NA
+"Anchovies, sardines & relatives",Order,CLUPEIFORMES,NA,NA
+Angelfishes,Family,POMACANTHIDAE,NA,NA
+Birches,Family,BETULACEAE,NA,NA
+Birds,Class,AVES,NA,NA
+Blennies,Family,BLENNIIDAE,NA,NA
+Blennies,Family,CHAENOPSIDAE,NA,NA
+Blennies,Family,CLINIDAE,NA,NA
+Blennies,Family,DACTYLOSCOPIDAE,NA,NA
+Blennies,Family,LABRISOMIDAE,NA,NA
+Blennies,Family,TRIPTERYGIIDAE,NA,NA
+Butterflyfishes,Family,CHAETODONTIDAE,NA,NA
+Cacti,Family,CACTACEAE,NA,NA
+Cephalopods,Class,CEPHALOPODA,NA,NA
+Chameleons,Family,CHAMAELEONIDAE,NA,NA
+Coelacanths & Lungfish,Class,SARCOPTERYGII,NA,NA
+Cone Snails,Genus,Conus,NA,NA
+Conifers,Class,PINOPSIDA,NA,NA
+"Crocodiles, Alligators, etc.",Order,CROCODYLIA,NA,NA
+Cycads,Class,CYCADOPSIDA,NA,NA
+FW Crabs,Families,GECARCINUCIDAE,NA,NA
+FW Crabs,Families,POTAMIDAE,NA,NA
+FW Crabs,Families,POTAMONAUTIDAE,NA,NA
+FW Crabs,Families,PSEUDOTHELPHUSIDAE,NA,NA
+FW Crabs,Families,TRICHODACTYLIDAE,NA,NA
+FW Crayfish,Family,ASTACIDAE,NA,NA
+FW Crayfish,Family,CAMBARIDAE,NA,NA
+FW Crayfish,Family,PARASTACIDAE,NA,NA
+Gnetopsida,Class,GNETOPSIDA,NA,NA
+Groupers,Family,EPINEPHELIDAE,NA,NA
+Hagfishes,Class,MYXINI,NA,NA
+Horseshoe Crabs,Class,MEROSTOMATA,NA,NA
+Lobsters,Family,GLYPHEIDAE,NA,NA
+Lobsters,Family,POLYCHELIDAE,NA,NA
+Lobsters,Family,NEPHROPIDAE,NA,NA
+Lobsters,Family,ENOPLOMETOPIDAE,NA,NA
+Lobsters,Family,PALINURIDAE,NA,NA
+Lobsters,Family,SCYLLARIDAE,NA,NA
+Magnolias,Family,MAGNOLIACEAE,NA,NA
+Mammals,Class,MAMMALIA,NA,NA
+Marine Turtles,Family,CHELONIIDAE,NA,NA
+Marine Turtles,Family,DERMOCHELYIDAE,NA,NA
+"Pufferfishes, etc.",Family,TETRAODONTIDAE,NA,NA
+"Seabreams, Porgies & Picarels",Family,SPARIDAE,NA,NA
+"Seabreams, Porgies & Picarels",Family,CENTRACANTHIDAE,NA,NA
+Seasnakes,Family,ELAPIDAE,Genus,Acalyptophis
+Seasnakes,Family,ELAPIDAE,Genus,Aipysurus
+Seasnakes,Family,ELAPIDAE,Genus,Astrotia
+Seasnakes,Family,ELAPIDAE,Genus,Emydocephalus
+Seasnakes,Family,ELAPIDAE,Genus,Enhydrina
+Seasnakes,Family,ELAPIDAE,Genus,Ephalophis
+Seasnakes,Family,ELAPIDAE,Genus,Hydrelaps
+Seasnakes,Family,ELAPIDAE,Genus,Hydrophis
+Seasnakes,Family,ELAPIDAE,Genus,Kerilia
+Seasnakes,Family,ELAPIDAE,Genus,Kolpophis
+Seasnakes,Family,ELAPIDAE,Genus,Lapemis
+Seasnakes,Family,ELAPIDAE,Genus,Laticauda
+Seasnakes,Family,ELAPIDAE,Genus,Parahydrophis
+Seasnakes,Family,ELAPIDAE,Genus,Pelamis
+Seasnakes,Family,ELAPIDAE,Genus,Thalassophina
+Seasnakes,Family,ELAPIDAE,Genus,Thalassophis
+Seasnakes,Family,ACROCHORDIDAE,Genus,Acrochordus
+Seasnakes,Family,HOMALOPSIDAE,NA,NA
+Seasnakes,Family,NATRICIDAE,Genus,Anoplohydrus
+"Sharks, Rays & Chimaeras",Class,CHONDRICHTHYES,NA,NA
+Sturgeons,Order,ACIPENSERIFORMES,NA,NA
+Surgeonfishes,Family,ACANTHURIDAE,NA,NA
+"Syngathiform fishes
+(Seahorses & Pipefishes, Ghost Pipefishes, Seamoths, Shrimpfishes, Trumpetfishes, Cornetfishes)",Family,SYNGNATHIDAE,NA,NA
+"Syngathiform fishes
+(Seahorses & Pipefishes, Ghost Pipefishes, Seamoths, Shrimpfishes, Trumpetfishes, Cornetfishes)",Family,AULOSTOMIDAE,NA,NA
+"Syngathiform fishes
+(Seahorses & Pipefishes, Ghost Pipefishes, Seamoths, Shrimpfishes, Trumpetfishes, Cornetfishes)",Family,CENTRISCIDAE,NA,NA
+"Syngathiform fishes
+(Seahorses & Pipefishes, Ghost Pipefishes, Seamoths, Shrimpfishes, Trumpetfishes, Cornetfishes)",Family,FISTULARIIDAE,NA,NA
+"Syngathiform fishes
+(Seahorses & Pipefishes, Ghost Pipefishes, Seamoths, Shrimpfishes, Trumpetfishes, Cornetfishes)",Family,PEGASIDAE,NA,NA
+"Syngathiform fishes
+(Seahorses & Pipefishes, Ghost Pipefishes, Seamoths, Shrimpfishes, Trumpetfishes, Cornetfishes)",Family,SOLENOSTOMIDAE,NA,NA
+Southern Beeches,Family,NOTHOFAGACEAE,NA,NA
+Tarpons & Bonefishes,Order,ALBULIFORMES,NA,NA
+Tarpons & Bonefishes,Order,ELOPIFORMES,NA,NA
+Teas,Family,THEACEAE,NA,NA
+Tunas & Billfishes,Family,SCOMBRIDAE,NA,NA
+Tunas & Billfishes,Family,ISTIOPHORIDAE,NA,NA
+Tunas & Billfishes,Family,XIPHIIDAE,NA,NA
+Wrasses & Parrotfishes,Family,LABRIDAE,NA,NA
+Wrasses & Parrotfishes,Family,SCARIDAE,NA,NA
