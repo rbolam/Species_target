@@ -35,5 +35,5 @@ actions %>%
   labs(x = "Recovery actions needed", y = "Number of species") +
   theme(legend.position = c(0.8, 0.3),
         text = element_text(size = 6.5))
-ggsave("figures/actions.png", height = 8, width = 12, dpi = 300, unit = "cm")
+ggsave("figures/figure2.png", height = 8, width = 12, dpi = 300, unit = "cm")
 
