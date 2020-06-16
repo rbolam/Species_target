@@ -9,7 +9,7 @@ library(tidyverse)
 ## ----------------- Comprehensively assessed groups - merge --------------------------####
 
 folders <- list.files("data/rl_download_12_05_2020/") ## make list of files in folder
-folders <- folders[2:4] # remove all other spp folder
+folders <- folders[2:4] # remove all other spp folder as they need filtering
 summaries <- data.frame()
 threats <- data.frame()
 actions <- data.frame()
@@ -43,10 +43,11 @@ for(i in 1:length(folders)) {
 
 ## --------------- Load all other spp: --------------------------------------####
 comp <- read.csv("data/comprehensive_groups.csv")
+## lists which groups are comprehensively assessed, and associated taxonomic naming
 
 ## Sep files for sep tax hierarchies:
-ord <- filter(comp, tax1 == "Order")
 cla <- filter(comp, tax1 == "Class")
+ord <- filter(comp, tax1 == "Order")
 fam <- filter(comp, tax1 %in% c("Family", "Families"))
 gen <- filter(comp, tax1 == "Genus")
 
@@ -73,7 +74,7 @@ spp <- bind_rows(spp1, spp2)
 
 ## Count classes for checking of taxonomies
 a <- count(summaries, className)
-#write_csv(a, "data/count_tax.csv") ##pretty consistent!!
+#write_csv(a, "data/count_tax.csv") 
 
 
 ## Merge summaries/ threats and actions for all: -------------------------####
@@ -84,20 +85,21 @@ summaries <- bind_rows(summaries, spp)
 thr <- read.csv("data/rl_download_12_05_2020/all_other_spp/threats.csv", 
                       na.string = c("", "NA"))
 thr <- filter(thr, scientificName %in% spp$scientificName)
-threats <- bind_rows(threats, thr)
+threats <- bind_rows(threats, thr) ## Add all other spp to birds etc
 
 
 ## Action data:
 act <- read.csv("data/rl_download_12_05_2020/all_other_spp/conservation_needed.csv", 
                      na.string = c("", "NA"))
 act <- filter(act, scientificName %in% spp$scientificName)
-actions <- bind_rows(actions, act)
+actions <- bind_rows(actions, act) ## Add all other spp to birds etc
 
 
 # all_other_fields data:
 allo <- read.csv("data/rl_download_12_05_2020/all_other_spp/all_other_fields.csv", 
                  na.string = c("", "NA"))
-allother <- bind_rows(allother, allo)
+allo <- filter(allo, scientificName %in% spp$scientificName)
+allother <- bind_rows(allother, allo) ## Add all other spp to birds etc
 
 
 ## Calculate total number of relevant species:
@@ -182,7 +184,7 @@ stresses <- unique(stresses)
 
 ## Merge spp with target matching, and save file
 match <- read.csv("data/thr_str_tar_matched.csv")
-match$thr_lev2 <- as.character(match$thr_lev2)
+match$thr_lev2 <- as.character(match$thr_lev2) ## turn numeric into character
 
 stresses <- left_join(stresses, match, by = c("thr_lev2", "stressName", "thr_lev2name"))
 write_csv(stresses, "data/spp_tar.csv")
