@@ -45,7 +45,7 @@ thr_str %>%
   arrange(-n)
 
 
-## Percent/Count spp benefitting from each target:
+## Percent/Count spp benefiting from each target:
 thr_str %>% 
   filter(thr_lev1name != "Geological events") %>% ## remove Geol events as can't be mitigated
   select(scientificName, target) %>% 
@@ -54,33 +54,6 @@ thr_str %>%
   mutate(perc1 = n / nspp * 100) %>% ## calculate % of threatened/EW spp
   mutate(perc2 = n / 36602 * 100) %>% ## calculate % of all spp
   arrange(-n)
-
-
-## Percent of spp in each RL category that would be affected by threats not tackled:
-thr_str %>% 
-  filter(thr_lev1name != "Geological events") %>% ## remove Geol events as can't be mitigated
-  filter(is.na(target)) %>% 
-  left_join(summaries, by = "scientificName") %>% 
-  select(scientificName, redlistCategory) %>% 
-  unique() %>% 
-  count(redlistCategory) %>% 
-  mutate(perc = n / 1977 * 100) ## 2049 is no of spp
-
-
-## Count spp not benefitting from targets:
-spp_miss <- thr_str %>% 
-  filter(is.na(target)) %>% 
-  select(scientificName) %>% 
-  unique()
-
-thr_str %>% 
-  filter(scientificName %in% spp_miss$scientificName) %>% 
-  select(scientificName, target) %>% 
-  unique() %>% 
-  count(scientificName) %>% 
-  filter(n == 1) %>% 
-  nrow()
-
 
 
 ## Percent of spp benefitting from different actions:
