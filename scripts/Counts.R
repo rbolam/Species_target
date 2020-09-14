@@ -56,6 +56,12 @@ thr_str %>%
   arrange(-n)
 
 
+## Filter spp benefiting from target 3:
+target3 <- thr_str %>% 
+  filter(target == "Target 3") %>% 
+  select(scientificName) %>% 
+  unique()
+
 ## Percent of spp benefitting from different actions:
 act <- read.csv("data/actions_needed_tidy.csv")
 act %>% 
@@ -69,7 +75,7 @@ act %>%
 
 
 
-## ----------------- Identifying spp for which threats can't be tackled --------------------####
+## -------------- Identifying spp which need captivity until solutions found -----------------####
 
 
 ## Count corals threatened by temperature extremes:
@@ -98,9 +104,10 @@ threats %>%
 ## ------------------- Identifying spp which need emergency actions ------------------------####
 
 
-## Sort out mature individuals data:
+## Species with <= 1000 individuals:
 
 mature <- read.csv("data/all_other_fields.csv", na.string = c("", "U", "NA"))
+mature <- filter(mature, !is.na(PopulationSize.range))
 
 ## Remove median values:
 mature <- separate(mature, PopulationSize.range, sep = ",", into = "PopulationSize.range")
@@ -109,26 +116,28 @@ mature <- separate(mature, PopulationSize.range, sep = ",", into = "PopulationSi
 mature <- separate(mature, PopulationSize.range, sep = "-", into = c("low", "high"))
 mature$low <- as.numeric(mature$low)
 
-
-
 summaries <- read.csv("data/simple_summaries.csv")
-
-
 summaries <- full_join(summaries, mature, by = "scientificName")
 
-## Turn into one row per criterion:
+mature <- summaries %>% 
+  filter(low <= 1000) %>% 
+  select(scientificName, redlistCategory, low) %>% 
+  rename(min_population = low) %>% 
+  unique()
 
+
+## Species which fit certain criteria:
+
+summaries <- read.csv("data/simple_summaries.csv")
 summaries <- summaries %>% 
   select(scientificName, kingdomName, phylumName, className, redlistCategory, 
-         redlistCriteria, low) %>% 
+         redlistCriteria) %>% 
   separate_rows(redlistCriteria, sep = ";") %>% 
   filter(!is.na(redlistCriteria))
-
 
 ## Remove empty spaces:
 
 summaries$redlistCriteria <- str_squish(summaries$redlistCriteria)
-
 
 ## Add columns that extract criteria:
 
@@ -140,18 +149,11 @@ summaries$D1 <- str_detect(summaries$redlistCriteria, "^D1$") ##any exact matche
 summaries$Bac <- str_detect(summaries$redlistCriteria, "^B.a.*?c") ##any that start with B, 
 ## followed by any character, followed by a. *?c means anything in between, then c
 
-
-
-
-## -------------- Spp which need threat abatement AND emergency actions -------------------####
-
 suma <- summaries
 
 suma <- filter(suma, Bac == TRUE | C == TRUE & redlistCategory == "Critically Endangered" |
                  C2ai == TRUE | D1 == TRUE & redlistCategory == "Vulnerable" |
-                 D == TRUE & redlistCategory %in% c("Critically Endangered", "Endangered") |
-                 low <= 1000)
-
+                 D == TRUE & redlistCategory %in% c("Critically Endangered", "Endangered"))
 
 ## Spp listed under Bac for checking:
 
@@ -171,75 +173,41 @@ sppremove <- c("Acrocephalus familiaris", "Anas laysanensis", "Telespiza ultima"
                "Mannophryne cordilleriana", "Peromyscus stephani", "Mammillaria schwarzii",
                "Pediocactus knowltonii", "Sylvilagus robustus")
 
-suma <- filter(suma, !scientificName %in% sppremove)
+suma <- suma %>% 
+  filter(!scientificName %in% sppremove) %>% 
+  select(scientificName, redlistCategory) %>% 
+  unique()
 
 
-## Percent of spp that need threat abatement and emergency actions, of all threatened + EW spp:
-suma %>% select(scientificName) %>% unique() %>% nrow() / nspp * 100
+## -------------------------- Merge all relevant spp for target 3 ------------------####
 
-## Percent of spp that need threat abatement and emergency actions, of all spp:
-suma %>% select(scientificName) %>% unique() %>% nrow() / 36602 * 100
-
-
-suma %>% 
-  group_by(redlistCategory, Bac, C, C2ai, D, D1) %>% 
-  count() %>% 
-  gather(-redlistCategory, -n, key = "crit", value = "TF") %>% 
-  filter(TF == TRUE) %>% 
-  ggplot(aes(x = redlistCategory, y = n, fill = crit)) +
-  geom_col()
-
-## Check taxonomy of those spp:
-
-class <- count(summaries, className, name = "Countall")
-class2 <- count(suma, className, name = "Countemer")
-class <- class %>% 
-  full_join(class2, by = "className") %>% 
-  replace_na(list(Countall = 0, Countemer = 0)) %>% 
-  mutate(perc = Countemer / Countall * 100)
-
-a <- ggplot(class, aes(x = fct_reorder(className, perc), y = perc)) + geom_col() + 
-  coord_flip(ylim = c(0, 100)) + labs(x = "", y = "Percent")
-b <- ggplot(class, aes(x = fct_reorder(className, Countemer), y = Countemer)) + geom_col() + 
-  coord_flip()  + labs(x = "", y = "Number of species")
-grid.arrange(a, b, nrow = 1)  
+## Spp with criteria + spp with mature individuals <= 1000:
+suma <- full_join(suma, mature, by = c("scientificName", "redlistCategory")) 
+# 998 obs + 1036 obs - overlap of 687 = 1347
 
 
-suma %>% 
-  select(scientificName) %>% 
-  unique() %>% 
-  write_csv("data/spp_needing_thr_aba_act.csv")
+## EW species:
+suma %>% filter(redlistCategory == "Extinct in the Wild") %>% nrow()
+
+summaries <- read.csv("data/simple_summaries.csv")
+EW <- summaries %>% 
+  filter(redlistCategory == "Extinct in the Wild") %>% 
+  select(scientificName, redlistCategory) # 15 EW spp
+
+suma <- suma %>% 
+  full_join(EW, by = c("scientificName", "redlistCategory")) %>% 
+  select(scientificName, redlistCategory, min_population) %>% 
+  unique()
 
 
-## -------------- Spp which need emergency actions only -------------------####
+## Spp which need actions not covered by other targets:
+suma <- full_join(suma, target3, by = "scientificName")
+# 1357 + 1971 needing target 3 - 455 overlap = 2873
 
-## Count total criteria per spp:
-no_c <- count(summaries, scientificName, name = "allcrit")
+## Percent of spp that need target 3, of all threatened + EW spp:
+suma %>% nrow() / nspp * 100
 
-
-## Count the selected criteria per spp:
-no_a <- count(suma, scientificName, name = "selcrit")
-
-
-## Combine, calculate difference, and retain only spp where nos are the same:
-sumb <- suma %>% 
-  left_join(no_c, by = "scientificName") %>% 
-  left_join(no_a, by = "scientificName") %>% 
-  mutate(diff = allcrit - selcrit) %>% 
-  filter(diff == 0)
-
-## Percent of spp that need threat abatement and emergency actions, of all threatened + EW spp:
-sumb %>% select(scientificName) %>% unique() %>% nrow() / nspp * 100
-
-## Percent of spp that need threat abatement and emergency actions, of all spp:
-sumb %>% select(scientificName) %>% unique() %>% nrow() / 36602 * 100
-
-
-sumb %>% 
-  select(scientificName) %>% 
-  unique() %>% 
-  write_csv("data/spp_needing_act.csv")
-
-
+## Percent of spp that need emergency actions, of all spp:
+suma %>% nrow() / 36602 * 100
 
 
