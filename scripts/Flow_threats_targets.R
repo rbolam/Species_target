@@ -216,46 +216,15 @@ for(i in 1:length(folders)) {
 
 
 
-## Load spp files:
+## Get  spp with intrinsic threats:
 
-## spp matched to targets:
-
-spptar <- read.csv("data/spp_tar.csv") 
-
-spptar <- spptar %>% 
-  filter(is.na(target)) %>% 
+intr <- threats %>% 
+  filter(thr_lev1name == "Intrinsic factors") %>% 
   select(scientificName) %>% 
   unique()
 
 
-## Add col to indicate these spp have threats not matched by targets:
-spptar$spptar <- "yes"
 
-
-
-## Spp that need threat abatement and actions:
-
-sppthract <- read.csv("data/spp_needing_thr_aba_act.csv") 
-sppthract$sppthract <- "yes"
-
-
-
-## Summary of all spp that need an additional spp target:
-
-summaries <- read.csv("data/simple_summaries.csv")
-
-summaries <- summaries %>% 
-  left_join(spptar, by = "scientificName") %>% 
-  left_join(sppthract, by = "scientificName") %>% 
-  filter(spptar == "yes" | sppthract == "yes")
-
-
-
-## Calculate no of spp needing additional target:
-
-summaries %>% select(scientificName) %>% unique() %>%  nrow()
-2921 / 7313 * 100
-2921 / 36602 * 100
 
 ## Sort country level data
 
