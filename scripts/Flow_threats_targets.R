@@ -285,5 +285,14 @@ ggsave("figures/figure1.png", width = 11, height = 15, unit = "cm", dpi = 300)
 map.all %>% 
   select(region, n) %>% 
   unique() %>% 
-  filter(n > 250 & !is.na(region))
+  filter(n > 80 & !is.na(region))
 
+summary <- read.csv("data/simple_summaries.csv")
+intr <- left_join(intr, summary, by ="scientificName")
+
+intr %>% 
+  select(scientificName, className) %>% 
+  unique() %>% 
+  count(className) %>% 
+  mutate(perc = n / 1357 * 100) %>% 
+  arrange(-n)
