@@ -198,7 +198,7 @@ suma <- suma %>%
   full_join(EW, by = c("scientificName", "redlistCategory")) %>% 
   select(scientificName, redlistCategory, min_population) %>% 
   unique()
-
+write_csv(suma, "data/sppbelow100.csv")
 
 ## Spp which need actions not covered by other targets:
 suma <- full_join(suma, target3, by = "scientificName")
@@ -210,4 +210,4 @@ suma %>% nrow() / nspp * 100
 ## Percent of spp that need emergency actions, of all spp:
 suma %>% nrow() / 36602 * 100
 
-
+write_csv(suma, "data/alltarget3spp.csv")
