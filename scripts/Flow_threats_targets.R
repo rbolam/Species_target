@@ -58,7 +58,7 @@ threats_summ$thr_lev1name <-
 
 
 ## Set coordinates for polygons:
-x <- c(1, 1, 1.124, 1.124)
+x <- c(1, 1, 1.122, 1.122)
 
 
 ## Number of spp-threat combinations in each target:
@@ -161,20 +161,20 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
            fill = viridis(8, option = "E")[c(1:5,8)], alpha = 0.9, colour = NA) +
   
   #Polygon/rectangle for targets 1 & 2:
-  annotate("polygon", x = c(1.875, 1.875, 2, 2), y = c(13345, 26863, 23133, 17075), 
+  annotate("polygon", x = c(1.878, 1.878, 2, 2), y = c(13345, 26863, 23133, 17075), 
            fill = "grey90", alpha = 0.9, colour = NA) +  
   annotate("rect", xmin = 2, xmax = 2.125, ymin = 17075, ymax = 23133, 
            fill = "grey90", alpha = 0.9, colour = NA) +
   
   #Polygon/rectangle for target 3:
-  annotate("polygon", x = c(1.875, 1.875, 2, 2), y = c(9102, 13345, 12660, 9787), 
+  annotate("polygon", x = c(1.878, 1.878, 2, 2), y = c(9102, 13345, 12660, 9787), 
            fill = "grey90", alpha = 0.9, colour = NA) +
   annotate("rect", xmin = 2, xmax = 2.125, ymin = 9787, ymax = 12660, 
            fill = "grey90", alpha = 0.9, colour = NA) +
   
   ## Add labels:
-  geom_text(stat = "stratum", infer.label = FALSE, size = 1.6, fontface = "bold",  
-            colour = c(rep("grey10", 7), rep("grey90", 2), (rep("grey10", 6))),
+  geom_text(stat = "stratum", infer.label = FALSE, size = 1.6,  
+            colour = c(rep("black", 6), rep("white", 3), (rep("black", 6))),
             label = c("Other (2,055)", 
                       "Climate change & severe\nweather (1,339)",
                       "Intrinsic factors (1,357)",
@@ -188,7 +188,7 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
                       "Target 6 - Pollution\n(1,472)",
                       "Target 5 - Invasive\nspecies (1,695)", 
                       "Target 4 - Harvesting &\ntrade (4,596)", 
-                      "Target 3 - Manage species\nfor recovery (1,977)",
+                      "Target 3 - Manage\nspecies for recovery\n(1,977)",
                       "Target 1 & 2 -\nEcosystems & protected\nareas (6,058)")) +
   scale_x_discrete(limits = c("Threat", "Proposed targets"), name = "", expand = c(.001, 0)) + 
   scale_y_continuous(name = "Number of species", expand = c(0.001, 0)) + 
@@ -204,18 +204,6 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
 
 ## -------------------------------------- Map -----------------------------------####
 
-folders <- list.files("data/rl_download_12_05_2020/") ## make list of files in folder
-countries <- data.frame()
-
-
-for(i in 1:length(folders)) {
-  countr <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/countries.csv", 
-                           sep = ""), na.string = c("", "NA"))
-  countries <- bind_rows(countries, countr)
-}
-
-
-
 ## Get  spp with intrinsic threats:
 
 intr <- threats %>% 
@@ -224,9 +212,16 @@ intr <- threats %>%
   unique()
 
 
-
-
 ## Sort country level data
+
+folders <- list.files("data/rl_download_12_05_2020/") ## make list of files in folder
+countries <- data.frame()
+
+for(i in 1:length(folders)) {
+  countr <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/countries.csv", 
+                           sep = ""), na.string = c("", "NA"))
+  countries <- bind_rows(countries, countr)
+}
 
 
 countriesmatch <- read.csv("data/countrymatching.csv")
@@ -246,8 +241,8 @@ countries <- countries %>%
 
 
 ## Merge w relevant spp and count:
-summaries <- left_join(summaries, countries, by = "scientificName")
-spp_cou <- summaries %>% 
+intr <- left_join(intr, countries, by = "scientificName")
+spp_cou <- intr %>% 
   select(scientificName, region) %>% 
   unique() %>% 
   count(region)
@@ -255,7 +250,7 @@ spp_cou <- summaries %>%
 # Check distribution:
 spp_cou %>% ggplot(aes(x = n)) + geom_histogram()
 median(spp_cou$n)
-
+filter(spp_cou, n > 80)
 
 ## Map
 
@@ -282,7 +277,7 @@ ggplot() +
 
 plot_grid(a, b, ncol = 1, labels = "AUTO", rel_heights = c(1.5, 1))
 
-ggsave("figures/figure1.png", width = 12, height = 15, unit = "cm", dpi = 300)
+ggsave("figures/figure1.png", width = 11, height = 15, unit = "cm", dpi = 300)
 
 
 
