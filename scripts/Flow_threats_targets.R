@@ -10,17 +10,26 @@ library(cowplot)
 
 ## --------------------------- Sort data --------------------------####
 threats <- read.csv("data/spp_tar.csv")
+sppblw1000 <- read.csv("data/sppbelow100.csv")
+sppblw1000 <- select(sppblw1000, scientificName)
+sppblw1000$target <- c("Target 3")
+sppblw1000$thr_lev1name <- c("Intrinsic factors")
+
+
+threats <- bind_rows(threats, sppblw1000)
 
 ### Remove threat Geological events as they cannot be addressed by conservation action/policy
 threats <- threats %>% 
   filter(!thr_lev2 %in% c(10.1, 10.2, 10.3)) %>% 
+  filter(!is.na(target)) %>% 
   select(scientificName, thr_lev1name, target) %>% 
   unique()
 
 
 ### Add threats Transportation & service corridors, Energy Production & Mining, 
 ### Human intrusions & disturbance, to "other" as less than 5% of observations in each:
-threats %>% count(thr_lev1name) %>% mutate(perc = n/sum(n)*100) %>% arrange(-perc)
+threats %>% select(scientificName, thr_lev1name) %>% unique() %>% count(thr_lev1name) %>% 
+  mutate(perc = n/sum(n)*100) %>% arrange(-perc)
 
 threats$thr_lev1name[threats$thr_lev1name %in% c("Transportation & service corridors", 
                                                  "Energy production & mining", 
@@ -39,7 +48,9 @@ threats %>%
 threats_summ %>% group_by(thr_lev1name) %>% summarise(sum = sum(n)) %>% arrange(-sum)
 threats_summ$thr_lev1name <- factor(threats_summ$thr_lev1name)
 levels(threats_summ$thr_lev1name)
-threats_summ$thr_lev1name <- factor(threats_summ$thr_lev1name, levels(threats_summ$thr_lev1name)[c(2, 1, 8, 4, 5, 7, 3, 6)])
+threats_summ$thr_lev1name <- 
+  factor(threats_summ$thr_lev1name, 
+         levels(threats_summ$thr_lev1name)[c(2, 1, 9, 5, 6, 8, 4, 3, 7)])
 
 
 ## ---------------------------------------- Figure 1a ----------------------------------####
@@ -71,17 +82,17 @@ tar <- mutate(tar, double = all - n)
 
 
 # Calculate other values
-## Spp not addressed by targets:
-sum(tar$all) - tar[6,2] + (tar[6,4]/2) #top of rectangle
-sum(tar$all) - (tar[6,4]/2) #bottom of rectangle
+## Spp addressed by tar 1 + 2:
+sum(tar$all) - (tar[1,4]/2) #top of rectangle
+sum(tar$all) - tar[1,2] + (tar[1,4]/2) #bottom of rectangle
 sum(tar$all) #top of polygon
-sum(tar$all) - tar[6,2] #bottom of polygon
+sum(tar$all) - tar[1,2] #bottom of polygon
 
-## Spp addressed by targets 1 and 2:
-sum(tar$all) - tar[6,2] - tar[1,2] + (tar[1,4]/2) #top of rectangle
-sum(tar$all) - tar[6,2] - (tar[1,4]/2) #bottom of rectangle
-sum(tar$all) - tar[6,2] #top of polygon
-sum(tar$all) - tar[6,2] - tar[1,2] #bottom of polygon
+## Spp addressed by targets 3:
+sum(tar$all) - tar[1,2] - (tar[2,4]/2) #top of rectangle
+sum(tar$all) - tar[1,2] - tar[2,2] + (tar[2,4]/2) #bottom of rectangle
+sum(tar$all) - tar[1,2] #top of polygon
+sum(tar$all) - tar[1,2] - tar[2,2] #bottom of polygon
 
 
 ## Calculate no of spp in each threat (by target - some double counted):
@@ -108,7 +119,7 @@ thr$y1 <- NA
 thr$y2 <- NA
 
 
-for (i in 1:8) {
+for (i in 1:9) {
   if (i == 1) {
     thr$y1[i] <- sum(thr$all) - thr$all[i]
     thr$y2[i] <- sum(thr$all)
@@ -128,8 +139,9 @@ thr <- filter(thr, double > 0)
 
 ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
   geom_alluvium(aes(fill = thr_lev1name), alpha = 0.9, aes.bind = TRUE, width = 1/4) +
-  geom_stratum(size = 0.5, colour = "white", width = 1/4, fill = 
-                 c("white", NA, NA, rep("white", 5), rep("grey90", 4), "white", "white")) +
+  geom_stratum(size = 0.5, colour = "white", width = 1/4, 
+               fill = c("white", NA, NA, NA, rep("white", 5), rep("grey90", 4), "white", "white")
+               ) +
   ## Polygons for threats:
   annotate("polygon", x = x, y = c(thr$ymin[1], thr$ymax[1], thr$y2[1], thr$y1[1]), 
            fill = viridis(8, option = "E")[1], alpha = 0.9, colour = NA) + 
@@ -147,37 +159,38 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
   # Rectangles for threats:  
   annotate("rect", xmin = 0.875, xmax = 1, ymin = thr$ymin, ymax = thr$ymax, 
            fill = viridis(8, option = "E")[c(1:5,8)], alpha = 0.9, colour = NA) +
-
-  #Polygon/rectangle for no target:
-  annotate("polygon", x = c(1.875, 1.875, 2, 2), y = c(22620, 25528, 25063, 23086), 
-           fill = "grey10", alpha = 0.9, colour = NA) +
-  annotate("rect", xmin = 2, xmax = 2.125, ymin = 23068, ymax = 25063, 
-           fill = "grey10", alpha = 0.9, colour = NA) +
   
   #Polygon/rectangle for targets 1 & 2:
-  annotate("polygon", x = c(1.875, 1.875, 2, 2), y = c(9102, 22620, 18890, 12832), 
+  annotate("polygon", x = c(1.875, 1.875, 2, 2), y = c(13345, 26863, 23133, 17075), 
            fill = "grey90", alpha = 0.9, colour = NA) +  
-  annotate("rect", xmin = 2, xmax = 2.125, ymin = 12832, ymax = 18890, 
+  annotate("rect", xmin = 2, xmax = 2.125, ymin = 17075, ymax = 23133, 
+           fill = "grey90", alpha = 0.9, colour = NA) +
+  
+  #Polygon/rectangle for target 3:
+  annotate("polygon", x = c(1.875, 1.875, 2, 2), y = c(9102, 13345, 12660, 9787), 
+           fill = "grey90", alpha = 0.9, colour = NA) +
+  annotate("rect", xmin = 2, xmax = 2.125, ymin = 9787, ymax = 12660, 
            fill = "grey90", alpha = 0.9, colour = NA) +
   
   ## Add labels:
   geom_text(stat = "stratum", infer.label = FALSE, size = 1.6, fontface = "bold",  
-            colour = c(rep("grey10", 4), rep("grey90", 4), rep("grey10", 5), "grey90"),
+            colour = c(rep("grey10", 7), rep("grey90", 2), (rep("grey10", 6))),
             label = c("Other (2,055)", 
                       "Climate change & severe\nweather (1,339)",
+                      "Intrinsic factors (1,357)",
                       "Pollution (1,472)", 
                       "Natural system\nmodifications (1,517)", 
                       "Invasive & other pro-\nblematic species (1,926)", 
                       "Residential & commercial\ndevelopment (2,321)", 
                       "Agriculture & aquaculture\n(4,447)", 
                       "Biological resource use\n(4,596)", 
-                      "Target 6 - Climate\nchange (1,339)", 
-                      "Target 5 - Harvesting &\ntrade (4,596)", 
-                      "Target 4 - Pollution\n(1,472)", 
-                      "Target 3 - Invasive\nspecies (1,695)", 
-                      "Target 1 & 2 -\nEcosystems & protected\nareas (6,058)",
-                      "Not addressed by targets\n(1,977)")) +
-  scale_x_discrete(limits = c("Threat", "Post-2020 Framework"), name = "", expand = c(.001, 0)) + 
+                      "Target 7 - Climate\nchange (1,339)",
+                      "Target 6 - Pollution\n(1,472)",
+                      "Target 5 - Invasive\nspecies (1,695)", 
+                      "Target 4 - Harvesting &\ntrade (4,596)", 
+                      "Target 3 - Manage species\nfor recovery (1,977)",
+                      "Target 1 & 2 -\nEcosystems & protected\nareas (6,058)")) +
+  scale_x_discrete(limits = c("Threat", "Proposed targets"), name = "", expand = c(.001, 0)) + 
   scale_y_continuous(name = "Number of species", expand = c(0.001, 0)) + 
   scale_fill_viridis_d(option = "E", direction = 1) +
   theme_classic() +
