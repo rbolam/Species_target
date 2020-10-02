@@ -104,7 +104,17 @@ threats %>%
 ## ------------------- Identifying spp which need emergency actions ------------------------####
 
 
-## Species with <= 1000 individuals:
+## --------------------------- Species that need actions addressed by target 3 -------------####
+
+actions <- read.csv("data/actions_needed_tidy.csv")
+actions_tar3 <- actions %>% 
+  filter(name %in% c("Ex-situ conservation", "Species re-introduction", "Species recovery")) %>% 
+  select(scientificName, redlistCategory) %>% 
+  unique()
+
+actions_tar3$actions <- "yes"
+
+## --------------------------------- Species with <= 1000 individuals ----------------------####
 
 mature <- read.csv("data/all_other_fields.csv", na.string = c("", "U", "NA"))
 mature <- filter(mature, !is.na(PopulationSize.range))
