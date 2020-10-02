@@ -109,10 +109,23 @@ threats %>%
 actions <- read.csv("data/actions_needed_tidy.csv")
 actions_tar3 <- actions %>% 
   filter(name %in% c("Ex-situ conservation", "Species re-introduction", "Species recovery")) %>% 
-  select(scientificName, redlistCategory) %>% 
+  select(scientificName) %>% 
   unique()
 
 actions_tar3$actions <- "yes"
+
+
+
+## ---------------------- Species that face threats not addressed by other targets ----------####
+
+
+thr_match <- read.csv("data/spp_tar.csv")
+thr_match <- thr_match %>% 
+  filter(target == "Target 3") %>% 
+  select(scientificName) %>% 
+  unique()
+
+thr_match$other_threats <- "yes"
 
 ## --------------------------------- Species with <= 1000 individuals ----------------------####
 
