@@ -198,39 +198,44 @@ sppremove <- c("Acrocephalus familiaris", "Anas laysanensis", "Telespiza ultima"
 
 suma <- suma %>% 
   filter(!scientificName %in% sppremove) %>% 
-  select(scientificName, redlistCategory) %>% 
+  select(scientificName) %>% 
   unique()
+suma$smallpop <- "yes"
+
 
 
 ## -------------------------- Merge all relevant spp for target 3 ------------------####
 
-## Spp with criteria + spp with mature individuals <= 1000:
-suma <- full_join(suma, mature, by = c("scientificName", "redlistCategory")) 
-# 998 obs + 1036 obs - overlap of 687 = 1347
+
+## Spp which need specific actions:
+nrow(actions_tar3)
 
 
-## EW species:
-suma %>% filter(redlistCategory == "Extinct in the Wild") %>% nrow()
+## Spp which have threats not addressed by other targets:
+nrow(thr_match)
+
+
+## Spp with mature individuals <= 1000:
+nrow(suma)
+
 
 summaries <- read.csv("data/simple_summaries.csv")
-EW <- summaries %>% 
-  filter(redlistCategory == "Extinct in the Wild") %>% 
-  select(scientificName, redlistCategory) # 15 EW spp
 
-suma <- suma %>% 
-  full_join(EW, by = c("scientificName", "redlistCategory")) %>% 
-  select(scientificName, redlistCategory, min_population) %>% 
-  unique()
-write_csv(suma, "data/sppbelow100.csv")
 
-## Spp which need actions not covered by other targets:
-suma <- full_join(suma, target3, by = "scientificName")
-# 1357 + 1971 needing target 3 - 455 overlap = 2873
+summaries <- summaries %>% 
+  select(scientificName, redlistCategory) %>% 
+  left_join(actions_tar3, by = "scientificName") %>% 
+  left_join(thr_match, by = "scientificName") %>% 
+  left_join(suma, by = "scientificName")
 
-## Percent of spp that need target 3, of all threatened + EW spp:
-suma %>% nrow() / nspp * 100
+count(summaries, actions, other_threats)
+## spp that need additional actions: 1521
+## additional spp that have threats not tackled: 1971 (additional 1182 to above)
+## total spp needing target 3: 2703
+2703 / 7313 * 100
 
-## Percent of spp that need emergency actions, of all spp:
-suma %>% nrow() / 36602 * 100
 
-write_csv(suma, "data/alltarget3spp.csv")
+## additional spp with small populations: 489
+count(summaries, actions, other_threats, smallpop)
+
+write_csv(summaries, "data/target3_eligible.csv")
