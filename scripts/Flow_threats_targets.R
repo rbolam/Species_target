@@ -10,21 +10,26 @@ library(cowplot)
 
 ## --------------------------- Sort data --------------------------####
 threats <- read.csv("data/spp_tar.csv")
-sppblw1000 <- read.csv("data/sppbelow100.csv")
-sppblw1000 <- select(sppblw1000, scientificName)
-sppblw1000$target <- c("Target 3")
-sppblw1000$thr_lev1name <- c("Intrinsic factors")
+target3 <- read.csv("data/target3_eligible.csv")
+target3 <- target3 %>% 
+  filter(actions == "yes") %>% 
+  select(scientificName)
+target3$target <- "Target 3"
+target3$thr_lev1name <- "Additional actions required"
 
-
-threats <- bind_rows(threats, sppblw1000)
+threats <- bind_rows(threats, target3)
 
 ### Remove threat Geological events as they cannot be addressed by conservation action/policy
-threats <- threats %>% 
+#threats <- 
+threats %>% 
   filter(!thr_lev2 %in% c(10.1, 10.2, 10.3)) %>% 
-  filter(!is.na(target)) %>% 
+  filter(is.na(target)) #%>% 
   select(scientificName, thr_lev1name, target) %>% 
   unique()
 
+threats %>% 
+  filter(thr_lev2 %in% c(10.1, 10.2, 10.3)) %>% 
+  nrow()
 
 ### Add threats Transportation & service corridors, Energy Production & Mining, 
 ### Human intrusions & disturbance, to "other" as less than 5% of observations in each:
