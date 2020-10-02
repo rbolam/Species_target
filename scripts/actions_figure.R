@@ -38,24 +38,3 @@ actions %>%
 ggsave("figures/figure2.png", height = 8, width = 12, dpi = 300, unit = "cm")
 
 
-## ------------ For spp below 1,000 --------------------------####
-
-sppblw1000 <- read.csv("data/sppbelow100.csv")
-
-actions %>% 
-  select(scientificName, name, redlistCategory) %>% 
-  filter(redlistCategory != "Extinct in the Wild") %>% ##exclude 15 EW spp as can't see them
-  filter(scientificName %in% sppblw1000$scientificName) %>% 
-  unique() %>% 
-  ggplot(aes(x = fct_rev(fct_infreq(name)), fill = redlistCategory)) +
-  geom_bar() +
-  coord_flip() +
-  scale_fill_manual(values = c("#fecc5c", "#fd8d3c", "#e31a1c"), 
-                    name = "IUCN Red List\nCategory") +
-  scale_y_continuous(expand = c(0.001, 0)) + 
-  theme_classic() +
-  guides(fill = guide_legend(reverse = TRUE)) +
-  labs(x = "Recovery actions needed", y = "Number of species") +
-  theme(legend.position = c(0.8, 0.3),
-        text = element_text(size = 6.5))
-ggsave("figures/figure2_option2.png", height = 8, width = 12, dpi = 300, unit = "cm")
