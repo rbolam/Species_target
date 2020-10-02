@@ -20,16 +20,12 @@ target3$thr_lev1name <- "Additional actions required"
 threats <- bind_rows(threats, target3)
 
 ### Remove threat Geological events as they cannot be addressed by conservation action/policy
-#threats <- 
-threats %>% 
+threats <- threats %>% 
   filter(!thr_lev2 %in% c(10.1, 10.2, 10.3)) %>% 
-  filter(is.na(target)) #%>% 
   select(scientificName, thr_lev1name, target) %>% 
   unique()
 
-threats %>% 
-  filter(thr_lev2 %in% c(10.1, 10.2, 10.3)) %>% 
-  nrow()
+  
 
 ### Add threats Transportation & service corridors, Energy Production & Mining, 
 ### Human intrusions & disturbance, to "other" as less than 5% of observations in each:
