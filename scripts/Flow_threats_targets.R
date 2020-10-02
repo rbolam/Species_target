@@ -205,10 +205,10 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
 
 ## -------------------------------------- Map -----------------------------------####
 
-## Get  spp with intrinsic threats:
+## Get  spp needing target 3:
 
-intr <- threats %>% 
-  filter(thr_lev1name == "Intrinsic factors") %>% 
+tar3 <- threats %>% 
+  filter(target == "Target 3") %>% 
   select(scientificName) %>% 
   unique()
 
@@ -242,8 +242,8 @@ countries <- countries %>%
 
 
 ## Merge w relevant spp and count:
-intr <- left_join(intr, countries, by = "scientificName")
-spp_cou <- intr %>% 
+tar3 <- left_join(tar3, countries, by = "scientificName")
+spp_cou <- tar3 %>% 
   select(scientificName, region) %>% 
   unique() %>% 
   count(region)
@@ -251,7 +251,7 @@ spp_cou <- intr %>%
 # Check distribution:
 spp_cou %>% ggplot(aes(x = n)) + geom_histogram()
 median(spp_cou$n)
-filter(spp_cou, n > 80)
+filter(spp_cou, n > 250)
 
 ## Map
 
