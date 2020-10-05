@@ -250,8 +250,9 @@ spp_cou <- tar3 %>%
 
 # Check distribution:
 spp_cou %>% ggplot(aes(x = n)) + geom_histogram()
-median(spp_cou$n)
-filter(spp_cou, n > 250)
+filter(spp_cou, n > 250) %>% 
+  arrange(-n)
+summary(spp_cou$n)
 
 ## Map
 
@@ -259,7 +260,7 @@ filter(spp_cou, n > 250)
 map.all <- map_data(map = "world")
 map.all <- full_join(map.all, spp_cou, by = "region") 
 
-map.all %>% select(region, n) %>%  unique() %>% arrange(-n)
+map.all %>% select(region, n) %>%  unique() %>% filter(is.na(n))
 
 
 ggplot() + 
