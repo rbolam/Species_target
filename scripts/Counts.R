@@ -7,7 +7,7 @@ library(gridExtra)
 library(viridis)
 
 summaries <- read.csv("data/simple_summaries.csv")
-nspp <- summaries %>% select(scientificName) %>% unique() %>% nrow()
+nspp <- summaries %>% select(scientificName) %>% unique() %>% nrow() ##no of all included spp
 nspp / 36602 *100  ## calculate % of all spp that are threatened + EW
 
 summaries %>% count(className) ## count no in each class
@@ -51,7 +51,9 @@ thr_str %>%
   labs(x = "Threats", y = "Number of species") +
   theme(legend.position = "none",
         text = element_text(size = 6.5))
-ggsave("figures/supp_threat_figure.png", height = 8, width = 10, dpi = 300, unit = "cm")
+ggsave("figures/supp_threat_figure.png", height = 6, width = 9, dpi = 300, unit = "cm")
+
+
 
 ## Percent/Count spp benefiting from each target:
 thr_str %>% 
@@ -62,6 +64,22 @@ thr_str %>%
   mutate(perc1 = n / nspp * 100) %>% ## calculate % of threatened/EW spp
   mutate(perc2 = n / 36602 * 100) %>% ## calculate % of all spp
   arrange(-n)
+
+
+thr_str %>% 
+  filter(thr_lev1name != "Geological events") %>% ## remove Geol events as can't be mitigated
+  select(scientificName, target) %>% 
+  unique() %>% 
+  ggplot(aes(x = fct_rev(target), fill = target)) +
+  geom_bar() +
+  coord_flip() +
+  scale_fill_viridis_d(option = "D") +
+  scale_y_continuous(expand = c(0.005, 0)) + 
+  theme_classic() +
+  labs(x = "Threats", y = "Number of species") +
+  theme(legend.position = "none",
+        text = element_text(size = 6.5))
+ggsave("figures/supp_target_figure.png", height = 4, width = 5, dpi = 300, unit = "cm")
 
 
 ## Filter spp benefiting from target 3:
