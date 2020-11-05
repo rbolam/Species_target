@@ -4,6 +4,7 @@
 
 library(tidyverse)
 library(gridExtra)
+library(viridis)
 
 summaries <- read.csv("data/simple_summaries.csv")
 nspp <- summaries %>% select(scientificName) %>% unique() %>% nrow()
@@ -23,27 +24,34 @@ thr %>%
   nrow() / nrow(summaries) * 100
 
 
-## Percent of threats with stresses listed:
-thr %>% 
-  select(scientificName, code, stressCode) %>% 
-  unique() %>% 
-  #nrow() 
-  filter(is.na(stressCode)) %>% 
-  nrow()
-(33984 - 1003) / 33984 * 100
-
 
 ## Count spp threatened by each threat (level 1):
 thr_str <- read.csv("data/spp_tar.csv")
 thr_str %>% 
   select(scientificName, thr_lev1name) %>% 
-  filter(thr_lev1name != "Geological events") %>% ## remove Geol events as can't be mitigated
+  filter(thr_lev1name != "Geological events") %>% #remove 141 spp with Geol events (no mitigation)
   unique() %>% 
   count(thr_lev1name) %>% 
   mutate(perc1 = n / nspp * 100) %>% ## calculate % of threatened/EW spp
   mutate(perc2 = n / 36602 * 100) %>% ## calculate % of all spp
   arrange(-n)
 
+thr_str$thr_lev1name <- as.factor(thr_str$thr_lev1name)
+thr_str$thr_lev1name <- factor(thr_str$thr_lev1name, levels(thr_str$thr_lev1name)
+                               [c(2, 1, 11, 7, 8, 10, 3, 12, 6, 4, 5, 9)])
+thr_str %>% 
+  select(scientificName, thr_lev1name) %>% 
+  unique() %>% 
+  ggplot(aes(x = fct_rev(fct_infreq(thr_lev1name)), fill = thr_lev1name)) +
+  geom_bar() +
+  coord_flip() +
+  scale_fill_viridis_d(option = "B") +
+  scale_y_continuous(expand = c(0.004, 0)) + 
+  theme_classic() +
+  labs(x = "Threats", y = "Number of species") +
+  theme(legend.position = "none",
+        text = element_text(size = 6.5))
+ggsave("figures/supp_threat_figure.png", height = 8, width = 10, dpi = 300, unit = "cm")
 
 ## Percent/Count spp benefiting from each target:
 thr_str %>% 
@@ -114,6 +122,11 @@ actions_tar3 <- actions %>%
 
 actions_tar3$actions <- "yes"
 
+ex_situ <- actions %>% 
+  filter(name %in% c("Ex-situ conservation")) %>% 
+  select(scientificName) %>% 
+  unique()
+write_csv(ex_situ, "data/spp_needing_exsitu.csv")
 
 
 ## ---------------------- Species that face threats not addressed by other targets ----------####
@@ -239,3 +252,28 @@ count(summaries, actions, other_threats)
 count(summaries, actions, other_threats, smallpop)
 
 write_csv(summaries, "data/target3_eligible.csv")
+
+
+## Identify which spp needing ex-situ have ex-situ populations --------------------####
+
+exsitu <- read.csv("data/spp_needing_exsitu.csv")
+
+
+folders <- list.files("data/rl_download_12_05_2020/") ## make list of files in folder
+
+allfields <- data.frame()
+
+
+## ------------------- Load birds, corals and fw shrimp:-----------------------####
+for(i in 1:length(folders)) {
+  # Make df called summaries of all RL aummary files:
+  summ <- read_csv(paste("data/rl_download_12_05_2020/", folders[i], "/all_other_fields.csv", 
+                         sep = ""), na = c("", "NA"))
+  summ <- select(summ, scientificName, InPlaceSpeciesManagementExSitu.value)
+  allfields <- bind_rows(allfields, summ)
+}
+
+allfields <- allfields %>% 
+  filter(scientificName %in% exsitu$scientificName) %>% 
+  unique()
+allfields %>% count(InPlaceSpeciesManagementExSitu.value)
