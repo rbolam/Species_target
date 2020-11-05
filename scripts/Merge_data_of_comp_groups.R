@@ -9,7 +9,9 @@ library(tidyverse)
 ## ----------------- Comprehensively assessed groups - merge --------------------------####
 
 folders <- list.files("data/rl_download_12_05_2020/") ## make list of files in folder
-folders <- folders[2:4] # remove all other spp folder as they need filtering
+folders <- folders[2:4] # remove "all_other_spp" folder as they need filtering
+
+## set up empty dataframes to be added to in loop:
 summaries <- data.frame()
 threats <- data.frame()
 actions <- data.frame()
@@ -43,15 +45,15 @@ for(i in 1:length(folders)) {
 
 ## --------------- Load all other spp: --------------------------------------####
 comp <- read.csv("data/comprehensive_groups.csv")
-## lists which groups are comprehensively assessed, and associated taxonomic naming
+## load file that lists which groups are comprehensively assessed, & associated taxonomic naming
 
-## Sep files for sep tax hierarchies:
+## Make separate dataframes for separate taxonomic hierarchies:
 cla <- filter(comp, tax1 == "Class")
 ord <- filter(comp, tax1 == "Order")
 fam <- filter(comp, tax1 %in% c("Family", "Families"))
 gen <- filter(comp, tax1 == "Genus")
 
-## Deal sep with tax groups where we need 2 levels:
+## Deal separately with taxonomic groups where we need 2 levels (family & genus):
 comp2 <- filter(comp, !is.na(tax2))
 
 ## load in summary data:
@@ -62,9 +64,11 @@ summ <- read.csv("data/rl_download_12_05_2020/all_other_spp/simple_summary.csv",
 ## Retain those spp in first tax level:
 spp <- filter(summ, orderName %in% ord$group1 | className %in% cla$group1 | 
                 familyName %in% fam$group1 | genusName %in% gen$group1)
-spp1 <- filter(spp, ! familyName %in% comp2$group1)
 
-## Retain those spp in second tax level:
+## Remove spp with 2 taxonomic levels:
+spp1 <- filter(spp, !familyName %in% comp2$group1)
+
+## Retain spp with 2 taxonomic levels:
 spp2 <- filter(spp, familyName %in% comp2$group1 & genusName %in% comp2$group2)
 
 ## Merge:
@@ -77,29 +81,9 @@ a <- count(summaries, className)
 #write_csv(a, "data/count_tax.csv") 
 
 
-## Merge summaries/ threats and actions for all: -------------------------####
 
-summaries <- bind_rows(summaries, spp)
-
-## Threat data:
-thr <- read.csv("data/rl_download_12_05_2020/all_other_spp/threats.csv", 
-                      na.string = c("", "NA"))
-thr <- filter(thr, scientificName %in% spp$scientificName)
-threats <- bind_rows(threats, thr) ## Add all other spp to birds etc
-
-
-## Action data:
-act <- read.csv("data/rl_download_12_05_2020/all_other_spp/conservation_needed.csv", 
-                     na.string = c("", "NA"))
-act <- filter(act, scientificName %in% spp$scientificName)
-actions <- bind_rows(actions, act) ## Add all other spp to birds etc
-
-
-# all_other_fields data:
-allo <- read.csv("data/rl_download_12_05_2020/all_other_spp/all_other_fields.csv", 
-                 na.string = c("", "NA"))
-allo <- filter(allo, scientificName %in% spp$scientificName)
-allother <- bind_rows(allother, allo) ## Add all other spp to birds etc
+summaries <- bind_rows(summaries, spp) ##summaries file contains birds, corals and fw shrimp
+##spp file contains all other groups - merge together
 
 
 ## Calculate total number of relevant species:
@@ -107,7 +91,31 @@ summaries %>% filter(redlistCategory != "Extinct") %>% nrow() + 8427
 ## Number doesn't include 8427 LC birds as they weren't downloaded
 ## Once LC birds included: total is 36602
 
-  
+
+## Merge threats, actions and all other fields for all: -------------------------####
+
+
+## Threat data for birds, corals and fw shrimp already loaded, so only adding other spp:
+thr <- read.csv("data/rl_download_12_05_2020/all_other_spp/threats.csv", 
+                      na.string = c("", "NA"))
+thr <- filter(thr, scientificName %in% spp$scientificName)
+threats <- bind_rows(threats, thr) ## Add all other spp to birds etc (saved in threats)
+
+
+## Action data:
+act <- read.csv("data/rl_download_12_05_2020/all_other_spp/conservation_needed.csv", 
+                     na.string = c("", "NA"))
+act <- filter(act, scientificName %in% spp$scientificName)
+actions <- bind_rows(actions, act) ## Add all other spp to birds etc (saved in actions)
+
+
+# all_other_fields data:
+allo <- read.csv("data/rl_download_12_05_2020/all_other_spp/all_other_fields.csv", 
+                 na.string = c("", "NA"))
+allo <- filter(allo, scientificName %in% spp$scientificName)
+allother <- bind_rows(allother, allo) ## Add all other spp to birds etc (saved in allother)
+
+
   
 ## Retain relevant RL categories and save files ---------------------------####
 summariesf <- summaries %>% 
