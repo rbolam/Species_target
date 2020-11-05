@@ -153,8 +153,7 @@ threats <- read.csv("data/threats.csv")
 stresses <- threats %>% 
   filter(timing %in% c("Future", "Ongoing")) %>% 
   select(scientificName, code, name, stressName) %>%
-  separate_rows(stressName, sep = "[|]") %>% 
-  filter(!is.na(stressName))
+  separate_rows(stressName, sep = "[|]") 
 
 
 ## Convert level 3 stresses to level 2:
@@ -179,7 +178,7 @@ stresses <- stresses %>%
   unite(thr_lev2, T1:T2, sep = ".")
 
 
-## Load in key for threat levels and names:
+## Load in key for threat levels and names and merge:
 thr_lev <- read.csv("data/threat_levels.csv")
 thr_lev$thr_lev2 <- as.character(thr_lev$thr_lev2)
 
@@ -187,13 +186,17 @@ stresses <- left_join(stresses, thr_lev, by = "thr_lev2")
 
 
 ## Remove duplicate spp (due to removing lev 3 threats and stresses):
-stresses <- unique(stresses)
+stresses <- stresses %>% 
+  unique() %>% ## retains 34207 combinations
+  filter(!is.na(stressName)) ## retains 33415 combinations
+33415 / 34207 * 100 ## percentage of observations with threats AND stresses listed
 
 
 ## Merge spp with target matching, and save file
-match <- read.csv("data/thr_str_tar_matched.csv")
+match <- read.csv("data/thr_str_tar_matched.csv") ##load file with manual target matching
 match$thr_lev2 <- as.character(match$thr_lev2) ## turn numeric into character
 
 stresses <- left_join(stresses, match, by = c("thr_lev2", "stressName", "thr_lev2name"))
 write_csv(stresses, "data/spp_tar.csv")
+
 
