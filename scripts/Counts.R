@@ -133,6 +133,16 @@ threats %>%
 ## --------------------------- Species that need actions addressed by target 3 -------------####
 
 actions <- read.csv("data/actions_needed_tidy.csv")
+
+
+## Count how many spp need emergency actions listed:
+actions %>% 
+  filter(name %in% c("Ex-situ conservation", "Species re-introduction", "Species recovery")) %>% 
+  select(scientificName, name) %>% 
+  unique() %>% 
+  count(name)
+
+
 actions_tar3 <- actions %>% 
   filter(name %in% c("Ex-situ conservation", "Species re-introduction", "Species recovery")) %>% 
   select(scientificName) %>% 
