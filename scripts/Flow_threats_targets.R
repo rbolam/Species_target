@@ -234,31 +234,36 @@ countries <- countries %>%
   filter(presence %in% c("Extant", "Possibly Extant", "Presence Uncertain", 
                          "Possibly Extinct")) %>% 
   select(scientificName, name) %>% 
-  unique() %>% 
-  full_join(countriesmatch, by = "name") %>% 
-  select(-name) %>% 
-  filter(!is.na(region)) %>% 
   unique()
 
+## Count spp per country + calc median:
+countries %>% filter(scientificName %in% tar3$scientificName) %>% unique() %>% count(name) %>% 
+  filter(n > 250) %>% arrange(-n)
 
-## Merge w relevant spp and count:
-tar3 <- left_join(tar3, countries, by = "scientificName")
-spp_cou <- tar3 %>% 
-  select(scientificName, region) %>% 
+
+## Match w full country list for map:
+countries <- full_join(countries, countriesmatch, by = "name") 
+
+
+countries %>% select(scientificName, region) %>% 
+  filter(scientificName %in% tar3$scientificName) %>% unique() %>% count(region) %>% 
+  summarise(median(n))
+
+
+countries <- countries %>% 
+  select(-name) %>% 
+  filter(!is.na(region)) %>% 
+  filter(scientificName %in% tar3$scientificName) %>% 
   unique() %>% 
   count(region)
 
-# Check distribution:
-spp_cou %>% ggplot(aes(x = n)) + geom_histogram()
-filter(spp_cou, n > 250) %>% 
-  arrange(-n)
-summary(spp_cou$n)
+
 
 ## Map
 
 
 map.all <- map_data(map = "world")
-map.all <- full_join(map.all, spp_cou, by = "region") 
+map.all <- full_join(map.all, countries, by = "region") 
 
 map.all %>% select(region, n) %>%  unique() %>% filter(is.na(n))
 
@@ -266,18 +271,19 @@ map.all %>% select(region, n) %>%  unique() %>% filter(is.na(n))
 ggplot() + 
   geom_map(data = map.all, map = map.all, 
            aes(map_id = region, x = long, y = lat, fill = n), colour = "black", size = 0.3) + 
-  scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "N") +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "Species\nrequiring\ntarget 3") +
   coord_proj("+proj=cea +lat_ts=37.5") +
   labs(tag = "", x = "", y = "") + 
   guides(colour = "none") +
   theme_void() +
   theme(text = element_text(size = 7),
+        legend.title = element_text(size = 5),
         legend.key.size = unit(0.4, "cm"),
         plot.margin = unit(c(0, 0, 0, 0.5), "cm")) ->
   b
 
 
-plot_grid(a, b, ncol = 1, labels = "AUTO", rel_heights = c(1.5, 1))
+plot_grid(a, b, ncol = 1, labels = c('(a)', '(b)'), rel_heights = c(1.5, 1))
 
 ggsave("figures/figure1.png", width = 11, height = 15, unit = "cm", dpi = 300)
 
