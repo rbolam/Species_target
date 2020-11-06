@@ -82,7 +82,7 @@ thr_str %>%
 ggsave("figures/supp_target_figure.png", height = 4, width = 5, dpi = 300, unit = "cm")
 
 
-## Filter spp benefiting from target 3:
+## Filter spp benefiting from target 3 (those for which threats not addressed by other targets):
 target3 <- thr_str %>% 
   filter(target == "Target 3") %>% 
   select(scientificName) %>% 
@@ -106,7 +106,7 @@ act %>%
 
 ## Count corals threatened by temperature extremes:
 
-thr_str <- read.csv("data/spp_tar.csv")
+thr_str <- read.csv("data/spp_tar.csv") ## file contains threats to second level
 thr_str %>%  
   left_join(summaries, by = "scientificName") %>% 
   filter(phylumName == "CNIDARIA" & thr_lev2 == "11.3") %>% 
@@ -116,7 +116,7 @@ thr_str %>%
 
 
 ## Count amphibians threatened by chytrid disease:
-threats <- read.csv("data/threats.csv")
+threats <- read.csv("data/threats.csv") ## file contains named invasive species
 threats %>% 
   left_join(summaries, by = "scientificName") %>% 
   filter(className == "AMPHIBIA" & ias == "Batrachochytrium dendrobatidis") %>% 
@@ -140,11 +140,6 @@ actions_tar3 <- actions %>%
 
 actions_tar3$actions <- "yes"
 
-ex_situ <- actions %>% 
-  filter(name %in% c("Ex-situ conservation")) %>% 
-  select(scientificName) %>% 
-  unique()
-write_csv(ex_situ, "data/spp_needing_exsitu.csv")
 
 
 ## ---------------------- Species that face threats not addressed by other targets ----------####
@@ -260,10 +255,13 @@ summaries <- summaries %>%
   left_join(suma, by = "scientificName")
 
 count(summaries, actions, other_threats)
-## spp that need additional actions: 1521
-## additional spp that have threats not tackled: 1971 (additional 1182 to above)
-## total spp needing target 3: 2703
-2703 / 7313 * 100
+## spp that need additional actions:
+791 + 730 #1521
+## spp that have threats not tackled:
+791 + 1186 #1977
+## total spp needing target 3, and %:
+791 + 730 + 1186 #2703
+2707 / 7313 * 100 #37%
 
 
 ## additional spp with small populations: 489
@@ -272,26 +270,3 @@ count(summaries, actions, other_threats, smallpop)
 write_csv(summaries, "data/target3_eligible.csv")
 
 
-## Identify which spp needing ex-situ have ex-situ populations --------------------####
-
-exsitu <- read.csv("data/spp_needing_exsitu.csv")
-
-
-folders <- list.files("data/rl_download_12_05_2020/") ## make list of files in folder
-
-allfields <- data.frame()
-
-
-## ------------------- Load birds, corals and fw shrimp:-----------------------####
-for(i in 1:length(folders)) {
-  # Make df called summaries of all RL aummary files:
-  summ <- read_csv(paste("data/rl_download_12_05_2020/", folders[i], "/all_other_fields.csv", 
-                         sep = ""), na = c("", "NA"))
-  summ <- select(summ, scientificName, InPlaceSpeciesManagementExSitu.value)
-  allfields <- bind_rows(allfields, summ)
-}
-
-allfields <- allfields %>% 
-  filter(scientificName %in% exsitu$scientificName) %>% 
-  unique()
-allfields %>% count(InPlaceSpeciesManagementExSitu.value)
