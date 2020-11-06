@@ -38,7 +38,7 @@ threats$thr_lev1name[threats$thr_lev1name %in% c("Transportation & service corri
   c("Other")
 
 
-### Count how many threats in each target
+### Count how many spp are affected by threats tackled in each target
 threats %>% 
   group_by(target, thr_lev1name) %>% 
   count() ->
@@ -175,7 +175,7 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
   
   ## Add labels:
   geom_text(stat = "stratum", infer.label = FALSE, size = 1.6,  
-            colour = c(rep("black", 6), rep("white", 3), (rep("black", 6))),
+            colour = c(rep("black", 6), rep("white", 3), (rep("black", 6))) ,
             label = c("Additional actions\nrequired (1,521)",
                       "Other (2,055)", 
                       "Climate change & severe\nweather (1,339)",
@@ -189,7 +189,7 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
                       "Target 6 - Pollution\n(1,472)",
                       "Target 5 - Invasive\nspecies (1,695)", 
                       "Target 4 - Harvesting &\ntrade (4,596)", 
-                      "Target 3 - Manage\nspecies for recovery\n(2,703)",
+                      "Target 3 - Manage\nspecies for recovery\n(2,707)",
                       "Target 1 & 2 -\nEcosystems & protected\nareas (6,058)")) +
   scale_x_discrete(limits = c("Threat", "Proposed targets"), name = "", expand = c(.001, 0)) + 
   scale_y_continuous(name = "Number of species", expand = c(0.001, 0)) + 
