@@ -82,11 +82,20 @@ thr_str %>%
 ggsave("figures/supp_target_figure.png", height = 4, width = 5, dpi = 300, unit = "cm")
 
 
-## Filter spp benefiting from target 3 (those for which threats not addressed by other targets):
+## Filter all spp benefiting from target 3 (those for which threats not addressed by other targets):
 target3 <- thr_str %>% 
   filter(target == "Target 3") %>% 
   select(scientificName) %>% 
   unique()
+
+## Filter spp ONLY benefiting from target 3:
+
+othertar <- thr_str %>% 
+  filter(target != "Target 3") %>% 
+  select(scientificName) %>% 
+  unique()
+
+target3 %>% filter(!scientificName %in% othertar$scientificName) %>% nrow()
 
 ## Percent of spp benefitting from different actions:
 act <- read.csv("data/actions_needed_tidy.csv")
