@@ -199,7 +199,7 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
   theme(legend.position = "none",
         text = element_text(size = 11),
         axis.ticks.x = element_blank(),
-        plot.margin = unit(c(0, 0.2, -0.3, 0.3), "cm"))
+        axis.text = element_text(colour = "black"))
 ggsave("figures/fig1.tiff", width = 6, height = 5.7, dpi = 300)
 
 
