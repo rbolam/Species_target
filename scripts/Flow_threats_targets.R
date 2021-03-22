@@ -276,15 +276,8 @@ ggplot() +
   labs(tag = "", x = "", y = "") + 
   guides(colour = "none") +
   theme_void() +
-  theme(text = element_text(size = 7),
-        legend.title = element_text(size = 5),
-        legend.key.size = unit(0.4, "cm"),
-        plot.margin = unit(c(0, 0, 0, 0.5), "cm")) ->
-  b
+  theme(text = element_text(size = 9))
 
-
-plot_grid(a, b, ncol = 1, labels = c('(a)', '(b)'), rel_heights = c(1.5, 1))
-
-ggsave("figures/figure1.png", width = 11, height = 15, unit = "cm", dpi = 300)
+ggsave("figures/fig2.tiff", width = 6, height = 3.1, dpi = 300)
 
 
