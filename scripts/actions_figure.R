@@ -26,15 +26,17 @@ actions %>%
   unique() %>% 
   ggplot(aes(x = fct_rev(fct_infreq(name)), fill = redlistCategory)) +
   geom_bar() +
-  coord_flip(ylim = c(0, 4000)) +
+  coord_flip(ylim = c(0, 4100)) +
   scale_fill_manual(values = c("#fecc5c", "#fd8d3c", "#e31a1c"), 
                     name = "IUCN Red List\nCategory") +
-  scale_y_continuous(expand = c(0.001, 0)) + 
+  scale_y_continuous(expand = c(0.001, 0), label = scales::comma) + 
   theme_classic() +
   guides(fill = guide_legend(reverse = TRUE)) +
   labs(x = "Recovery actions needed", y = "Number of species") +
   theme(legend.position = c(0.8, 0.3),
-        text = element_text(size = 6.5))
-ggsave("figures/figure2.png", height = 8, width = 11, dpi = 300, unit = "cm")
+        text = element_text(size = 9),
+        axis.text = element_text(colour = "black"))
+
+ggsave("figures/fig3.tiff", height = 4, width = 6, dpi = 300)
 
 
