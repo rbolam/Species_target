@@ -82,6 +82,8 @@ thr_str %>%
 ggsave("figures/supp_target_figure.png", height = 4, width = 5, dpi = 300, unit = "cm")
 
 
+## Venn diagram and counts of spp requiring Target 3
+
 ## Filter all spp benefiting from target 3 (those for which threats not addressed by other targets):
 target3 <- thr_str %>% 
   filter(target == "Target 3") %>% 
@@ -97,7 +99,8 @@ othertar <- thr_str %>%
 
 target3 %>% filter(!scientificName %in% othertar$scientificName) %>% nrow()
 
-## Percent of spp benefitting from different actions:
+
+## Percent of spp benefiting from different actions:
 act <- read.csv("data/actions_needed_tidy.csv")
 act %>% 
   select(scientificName, name) %>% 
@@ -106,6 +109,39 @@ act %>%
   mutate(perc1 = n / nspp * 100) %>% ## calculate % of threatened/EW spp
   mutate(perc2 = n / 36602 * 100) %>% ## calculate % of all spp
   arrange(-n)
+
+
+act %>% 
+  filter(name %in% c("Ex-situ conservation", "Species re-introduction", 
+                     "Species recovery")) %>% 
+  select(scientificName) %>% 
+  unique() ->
+  tar3actions
+
+tar3actions %>% filter(!scientificName %in% othertar$scientificName) %>% nrow()
+
+tar3actions$`Species that require\nrecovery actions`  <- TRUE
+
+target3$`Species that require\nthreat mitigation` <- TRUE
+
+tar3actions <- tar3actions %>% 
+  full_join(target3) %>% 
+  replace_na(list(`Species that require\nrecovery actions` = FALSE, 
+                  `Species that require\nthreat mitigation` = FALSE))
+
+
+ggplot(tar3actions, aes(A = `Species that require\nrecovery actions`, 
+             B = `Species that require\nthreat mitigation`)) +
+  geom_venn(fill_color = c("#B4B8AB", "#153243"), 
+            fill_alpha = 0.6,
+            stroke_color = c("#B4B8AB", "#153243"), 
+            show_percentage = FALSE,
+            set_name_size = 2.5) + 
+  labs(title = "Species that require Target 3") +
+  theme_void() + 
+  coord_fixed()
+ggsave("figures/venndiagram.png")
+
 
 
 
