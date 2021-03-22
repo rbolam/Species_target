@@ -54,7 +54,7 @@ threats_summ$thr_lev1name <-
          levels(threats_summ$thr_lev1name)[c(3, 2, 9, 5, 6, 8, 4, 7, 1)])
 
 
-## ---------------------------------------- Figure 1a ----------------------------------####
+## ---------------------------------------- Figure 1 ----------------------------------####
 
 
 
@@ -139,27 +139,27 @@ thr <- filter(thr, double > 0)
 
 
 ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
-  geom_alluvium(aes(fill = thr_lev1name), alpha = 0.9, aes.bind = TRUE, width = 1/4) +
+  geom_alluvium(aes(fill = thr_lev1name), alpha = 0.7, aes.bind = TRUE, width = 1/4) +
   geom_stratum(size = 0.5, colour = "white", width = 1/4, 
                fill = c(NA, "white", NA, NA, rep("white", 5), rep("grey90", 4), "white", "white")
                ) +
   ## Polygons for threats:
   annotate("polygon", x = x, y = c(thr$ymin[1], thr$ymax[1], thr$y2[1], thr$y1[1]), 
-           fill = viridis(9, option = "E")[1], alpha = 0.9, colour = NA) + 
+           fill = viridis(9, option = "E")[1], alpha = 0.7, colour = NA) + 
   annotate("polygon", x = x, y = c(thr$ymin[2], thr$ymax[2], thr$y2[2], thr$y1[2]), 
-           fill = viridis(9, option = "E")[2], alpha = 0.9, colour = NA) +  
+           fill = viridis(9, option = "E")[2], alpha = 0.7, colour = NA) +  
   annotate("polygon", x = x, y = c(thr$ymin[3], thr$ymax[3], thr$y2[3], thr$y1[3]), 
-           fill = viridis(9, option = "E")[3], alpha = 0.9, colour = NA) +  
+           fill = viridis(9, option = "E")[3], alpha = 0.7, colour = NA) +  
   annotate("polygon", x = x, y = c(thr$ymin[4], thr$ymax[4], thr$y2[4], thr$y1[4]), 
-           fill = viridis(9, option = "E")[4], alpha = 0.9, colour = NA) +  
+           fill = viridis(9, option = "E")[4], alpha = 0.7, colour = NA) +  
   annotate("polygon", x = x, y = c(thr$ymin[5], thr$ymax[5], thr$y2[5], thr$y1[5]), 
-           fill = viridis(9, option = "E")[5], alpha = 0.9, colour = NA) +  
+           fill = viridis(9, option = "E")[5], alpha = 0.7, colour = NA) +  
   annotate("polygon", x = x, y = c(thr$ymin[6], thr$ymax[6], thr$y2[6], thr$y1[6]), 
-           fill = viridis(9, option = "E")[8], alpha = 0.9, colour = NA) +  
+           fill = viridis(9, option = "E")[8], alpha = 0.7, colour = NA) +  
   
   # Rectangles for threats:  
   annotate("rect", xmin = 0.875, xmax = 1, ymin = thr$ymin, ymax = thr$ymax, 
-           fill = viridis(9, option = "E")[c(1:5,8)], alpha = 0.9, colour = NA) +
+           fill = viridis(9, option = "E")[c(1:5,8)], alpha = 0.7, colour = NA) +
   
   #Polygon/rectangle for targets 1 & 2:
   annotate("polygon", x = c(1.878, 1.878, 2, 2), y = c(13345, 26863, 23133, 17075), 
@@ -174,33 +174,33 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
            fill = "grey90", alpha = 0.9, colour = NA) +
   
   ## Add labels:
-  geom_text(stat = "stratum", infer.label = FALSE, size = 1.6,  
-            colour = c(rep("black", 6), rep("white", 3), (rep("black", 6))) ,
+  geom_text(stat = "stratum", infer.label = FALSE, size = 2.5,  
+            colour = "black" ,
             label = c("Additional actions\nrequired (1,521)",
                       "Other (2,055)", 
-                      "Climate change & severe\nweather (1,339)",
+                      "Climate change &\nsevere weather (1,339)",
                       "Pollution (1,472)", 
                       "Natural system\nmodifications (1,517)", 
-                      "Invasive & other pro-\nblematic species (1,926)", 
-                      "Residential & commercial\ndevelopment (2,321)", 
-                      "Agriculture & aquaculture\n(4,447)", 
-                      "Biological resource use\n(4,596)", 
+                      "Invasive & other\nproblematic species\n(1,926)", 
+                      "Residential &\ncommercial\ndevelopment (2,321)", 
+                      "Agriculture &\naquaculture (4,447)", 
+                      "Biological resource\nuse (4,596)", 
                       "Target 7 - Climate\nchange (1,339)",
                       "Target 6 - Pollution\n(1,472)",
                       "Target 5 - Invasive\nspecies (1,695)", 
-                      "Target 4 - Harvesting &\ntrade (4,596)", 
+                      "Target 4 - Harvesting\n& trade (4,596)", 
                       "Target 3 - Manage\nspecies for recovery\n(2,707)",
-                      "Target 1 & 2 -\nEcosystems & protected\nareas (6,058)")) +
+                      "Target 1 & 2 -\nEcosystems &\nprotected areas\n(6,058)")) +
   scale_x_discrete(limits = c("Threat", "Proposed targets"), name = "", expand = c(.001, 0)) + 
-  scale_y_continuous(name = "Number of species", expand = c(0.001, 0)) + 
+  scale_y_continuous(name = "Number of species", expand = c(0.001, 0), 
+  label = scales::comma) + 
   scale_fill_viridis_d(option = "E", direction = 1) +
   theme_classic() +
   theme(legend.position = "none",
-        text = element_text(size = 9),
+        text = element_text(size = 11),
         axis.ticks.x = element_blank(),
-        plot.margin = unit(c(0, 0.2, -0.3, 0.3), "cm")) ->
-  a
-
+        plot.margin = unit(c(0, 0.2, -0.3, 0.3), "cm"))
+ggsave("figures/fig1.tiff", width = 6, height = 5.7, dpi = 300)
 
 
 ## -------------------------------------- Map -----------------------------------####
