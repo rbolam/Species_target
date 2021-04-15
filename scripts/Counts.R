@@ -5,23 +5,30 @@
 library(tidyverse)
 library(gridExtra)
 library(viridis)
+library(ggvenn)
 
-summaries <- read.csv("data/simple_summaries.csv")
-nspp <- summaries %>% select(scientificName) %>% unique() %>% nrow() ##no of all included spp
-nspp / 36602 *100  ## calculate % of all spp that are threatened + EW
+summaries <- read.csv("data/all_summaries.csv")
+nspp <- summaries %>% select(scientificName, className) %>% unique()  ##no of all included spp
+tspp <- summaries %>% 
+  filter(redlistCategory %in% c("Extinct in the Wild", "Critically Endangered",
+                                "Endangered", "Vulnerable")) %>% 
+  select(scientificName, phylumName, className) %>% 
+  unique() ##no of all included threatened/ EW spp
+nrow(tspp) / nrow(nspp) *100  ## calculate % of all spp that are threatened + EW
 
-summaries %>% count(className) ## count no in each class
-
+nspp %>% count(className) ## count no in each class
+tspp %>% count(phylumName, className)
 
 ## ----------------------- Counts threats, targets, actions --------------------------------####
 
 
-## Percent of spp with at least one threat listed:
+## Percent of threatened spp with at least one threat listed:
 thr <- read.csv("data/threats.csv")
 thr %>% 
+  filter(scientificName %in% tspp$scientificName) %>% 
   select(scientificName) %>% 
   unique() %>% 
-  nrow() / nrow(summaries) * 100
+  nrow() / nrow(tspp) * 100
 
 
 
@@ -29,11 +36,11 @@ thr %>%
 thr_str <- read.csv("data/spp_tar.csv")
 thr_str %>% 
   select(scientificName, thr_lev1name) %>% 
-  filter(thr_lev1name != "Geological events") %>% #remove 141 spp with Geol events (no mitigation)
+  filter(thr_lev1name != "Geological events") %>% #remove 163 spp with Geol events (no mitigation)
   unique() %>% 
   count(thr_lev1name) %>% 
-  mutate(perc1 = n / nspp * 100) %>% ## calculate % of threatened/EW spp
-  mutate(perc2 = n / 36602 * 100) %>% ## calculate % of all spp
+  mutate(perc1 = n / nrow(tspp) * 100) %>% ## calculate % of threatened/EW spp
+  mutate(perc2 = n / nrow(nspp) * 100) %>% ## calculate % of all spp
   arrange(-n)
 
 thr_str$thr_lev1name <- as.factor(thr_str$thr_lev1name)
@@ -61,14 +68,15 @@ thr_str %>%
   select(scientificName, target) %>% 
   unique() %>% 
   count(target) %>% 
-  mutate(perc1 = n / nspp * 100) %>% ## calculate % of threatened/EW spp
-  mutate(perc2 = n / 36602 * 100) %>% ## calculate % of all spp
+  mutate(perc1 = n / nrow(tspp) * 100) %>% ## calculate % of threatened/EW spp
+  mutate(perc2 = n / nrow(nspp) * 100) %>% ## calculate % of all spp
   arrange(-n)
 
 
 thr_str %>% 
   filter(thr_lev1name != "Geological events") %>% ## remove Geol events as can't be mitigated
   select(scientificName, target) %>% 
+  filter(!is.na(target)) %>% 
   unique() %>% 
   ggplot(aes(x = fct_rev(target), fill = target)) +
   geom_bar() +
@@ -106,8 +114,8 @@ act %>%
   select(scientificName, name) %>% 
   unique() %>% 
   count(name) %>% 
-  mutate(perc1 = n / nspp * 100) %>% ## calculate % of threatened/EW spp
-  mutate(perc2 = n / 36602 * 100) %>% ## calculate % of all spp
+  mutate(perc1 = n / nrow(tspp) * 100) %>% ## calculate % of threatened/EW spp
+  mutate(perc2 = n / nrow(nspp) * 100) %>% ## calculate % of all spp
   arrange(-n)
 
 
@@ -220,7 +228,7 @@ mature <- separate(mature, PopulationSize.range, sep = ",", into = "PopulationSi
 mature <- separate(mature, PopulationSize.range, sep = "-", into = c("low", "high"))
 mature$low <- as.numeric(mature$low)
 
-summaries <- read.csv("data/simple_summaries.csv")
+summaries <- read.csv("data/all_summaries.csv")
 summaries <- full_join(summaries, mature, by = "scientificName")
 
 mature <- summaries %>% 
@@ -232,7 +240,7 @@ mature <- summaries %>%
 
 ## Species which fit certain criteria:
 
-summaries <- read.csv("data/simple_summaries.csv")
+summaries <- read.csv("data/all_summaries.csv")
 summaries <- summaries %>% 
   select(scientificName, kingdomName, phylumName, className, redlistCategory, 
          redlistCriteria) %>% 
@@ -259,26 +267,7 @@ suma <- filter(suma, Bac == TRUE | C == TRUE & redlistCategory == "Critically En
                  C2ai == TRUE | D1 == TRUE & redlistCategory == "Vulnerable" |
                  D == TRUE & redlistCategory %in% c("Critically Endangered", "Endangered"))
 
-## Spp listed under Bac for checking:
-
-suma %>% 
-  filter(Bac == TRUE) %>% 
-  select(scientificName, redlistCategory, redlistCriteria)
-
-
-## Manual check of which spp to retain:
-
-sppretain <- c("Turnix olivii", "Nothofagus alessandrii", "Pteropus rodricensis", 
-               "Aproteles bulmerae", "Otomys barbouri", "Lepus flavigularis", "Capensibufo rosei",
-               "Arthroleptella rugosa", "Pseudomys australis", "Urocitellus endemicus")
-sppremove <- c("Acrocephalus familiaris", "Anas laysanensis", "Telespiza ultima", "Alauda razae",
-               "Mimus trifasciatus", "Megadyptes antipodes", "Spheniscus mendiculus", 
-               "Montipora dilatata", "Pediocactus paradinei", "Peromyscus dickeyi", 
-               "Mannophryne cordilleriana", "Peromyscus stephani", "Mammillaria schwarzii",
-               "Pediocactus knowltonii", "Sylvilagus robustus")
-
 suma <- suma %>% 
-  filter(!scientificName %in% sppremove) %>% 
   select(scientificName) %>% 
   unique()
 suma$smallpop <- "yes"
@@ -311,15 +300,15 @@ summaries <- summaries %>%
 
 count(summaries, actions, other_threats)
 ## spp that need additional actions:
-791 + 730 #1521
+1252 + 611 #1836
 ## spp that have threats not tackled:
-791 + 1186 #1977
+1252 + 2172 #3424
 ## total spp needing target 3, and %:
-791 + 730 + 1186 #2703
-2707 / 7313 * 100 #37%
+1252 + 611 + 2172 #4035
+4035 / 7784 * 100 #52%
 
 
-## additional spp with small populations: 489
+## additional spp with small populations: 393
 count(summaries, actions, other_threats, smallpop)
 
 write_csv(summaries, "data/target3_eligible.csv")
