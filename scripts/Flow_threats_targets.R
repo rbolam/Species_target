@@ -258,7 +258,7 @@ countries <- countries %>%
   unique() %>% 
   count(region)
 
-countries %>% filter(n > 300)
+countries %>% filter(n > 300) %>% arrange(-n)
 
 ## Map
 
