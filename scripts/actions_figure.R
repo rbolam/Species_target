@@ -24,6 +24,8 @@ actions %>%
   select(scientificName, name, redlistCategory) %>% 
   filter(redlistCategory != "Extinct in the Wild") %>% ##exclude 13 EW spp as can't see them
   unique() %>%
+  #filter(name %in% c("Site/area protection", "Site/area management")) %>% select(scientificName) %>% unique() %>% nrow()
+  #count(name) %>% arrange(-n)
   ggplot(aes(x = fct_rev(fct_infreq(name)), fill = redlistCategory)) +
   geom_bar() +
   coord_flip(ylim = c(0, 4500)) +
