@@ -61,7 +61,7 @@ thr_str %>%
   labs(x = "Threats", y = "Number of species") +
   theme(legend.position = "none",
         text = element_text(size = 6.5))
-ggsave("figures/supp_threat_figure.png", height = 6, width = 9, dpi = 300, unit = "cm")
+#ggsave("figures/supp_threat_figure.png", height = 6, width = 9, dpi = 300, unit = "cm")
 
 
 
@@ -90,7 +90,7 @@ thr_str %>%
   labs(x = "Threats", y = "Number of species") +
   theme(legend.position = "none",
         text = element_text(size = 6.5))
-ggsave("figures/supp_target_figure.png", height = 4, width = 5, dpi = 300, unit = "cm")
+#ggsave("figures/supp_target_figure.png", height = 4, width = 5, dpi = 300, unit = "cm")
 
 
 ## Counts of spp requiring Target 3
@@ -306,14 +306,24 @@ count(summaries, actions, other_threats, smallpop)
 
 write_csv(summaries, "data/target3_eligible.csv")
 
+
+
+## Venn diagram
+
+
+summaries <- read.csv("data/target3_eligible.csv")
+
 summaries$actions <- recode(summaries$actions, yes = TRUE)
 summaries$other_threats <- recode(summaries$other_threats, yes = TRUE)
 
 summaries <- replace_na(summaries, list(actions = FALSE, other_threats = FALSE))
 
+summaries <-rename(summaries, `Species requiring\nrecovery actions` = actions,
+                   `Species affected by\nother threats` = other_threats)
 
-ggplot(summaries, aes(A = actions, 
-                      B = other_threats)) +
+
+ggplot(summaries, aes(A = `Species requiring\nrecovery actions`, 
+                      B = `Species affected by\nother threats`)) +
   geom_venn(fill_color = c("#B4B8AB", "#153243"), 
             fill_alpha = 0.6,
             stroke_color = c("#B4B8AB", "#153243"), 
