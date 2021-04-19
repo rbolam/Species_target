@@ -8,38 +8,52 @@ library(tidyverse)
 
 ## ----------------- Comprehensively assessed groups - merge --------------------------####
 
-folders <- list.files("data/rl_download_12_05_2020/") ## make list of files in folder
-folders <- folders[2:4] # remove "all_other_spp" folder as they need filtering
+folders <- list.files("data/rl_download_29_03_2021/") ## make list of files in folder
+folders <- folders[2:5] # remove "all_other_spp" folder as they need filtering
 
 ## set up empty dataframes to be added to in loop:
 summaries <- data.frame()
 threats <- data.frame()
 actions <- data.frame()
 allother <- data.frame()
+assess <- data.frame()
+use <- data.frame()
 
 ## ------------------- Load birds, corals and fw shrimp:-----------------------####
 for(i in 1:length(folders)) {
-  # Make df called summaries of all RL aummary files:
-  summ <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/simple_summary.csv", 
+  # Make df called summaries of all RL summary files:
+  summ <- read.csv(paste("data/rl_download_29_03_2021/", folders[i], "/simple_summary.csv", 
                          sep = ""), na.string = c("", "NA"))
   summaries <- bind_rows(summaries, summ)
   
   # Make df called threats of all RL threat files:
-  thr <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/threats.csv", 
+  thr <- read.csv(paste("data/rl_download_29_03_2021/", folders[i], "/threats.csv", 
                         sep = ""), na.string = c("", "NA"))
   threats <- bind_rows(threats, thr)
   
   # Make df called actions of all RL action files:
-  act <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/conservation_needed.csv", 
+  act <- read.csv(paste("data/rl_download_29_03_2021/", folders[i], "/conservation_needed.csv", 
                         sep = ""), na.string = c("", "NA"))
   actions <- bind_rows(actions, act)
   
   # Make df called allother of all all_other_fields files:
-  allo <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/all_other_fields.csv", 
+  allo <- read.csv(paste("data/rl_download_29_03_2021/", folders[i], "/all_other_fields.csv", 
                         sep = ""), na.string = c("", "NA"))
   allo$GenerationLength.range <- as.character(allo$GenerationLength.range)
   allo$LocationsNumber.range <- as.character(allo$LocationsNumber.range)
+  allo$EOO.range <- as.character(allo$EOO.range)
   allother <- bind_rows(allother, allo)
+  
+  # Make df called assess of all RL threat descriptions:
+  as <- read.csv(paste("data/rl_download_29_03_2021/", folders[i], "/assessments.csv", 
+                        sep = ""), na.string = c("", "NA"))
+  as <- select(as, scientificName, threats)
+  assess <- bind_rows(assess, as)
+  
+  # Make df called use of all use and trade data:
+  us <- read.csv(paste("data/rl_download_29_03_2021/", folders[i], "/usetrade.csv", 
+                       sep = ""), na.string = c("", "NA"))
+  use <- bind_rows(use, us)
 }
 
 
@@ -57,7 +71,7 @@ gen <- filter(comp, tax1 == "Genus")
 comp2 <- filter(comp, !is.na(tax2))
 
 ## load in summary data:
-summ <- read.csv("data/rl_download_12_05_2020/all_other_spp/simple_summary.csv", 
+summ <- read.csv("data/rl_download_29_03_2021/all_other_spp/simple_summary.csv", 
                  na.string = c("", "NA"))
 
 
@@ -75,53 +89,72 @@ spp2 <- filter(spp, familyName %in% comp2$group1 & genusName %in% comp2$group2)
 spp <- bind_rows(spp1, spp2)
 
 
-
-## Count classes for checking of taxonomies
-a <- count(summaries, className)
-#write_csv(a, "data/count_tax.csv") 
-
-
-
 summaries <- bind_rows(summaries, spp) ##summaries file contains birds, corals and fw shrimp
 ##spp file contains all other groups - merge together
 
 
+## Count classes for checking of taxonomies
+a <- count(summaries, phylumName, className)
+write_csv(a, "data/count_tax.csv") 
+
+
 ## Calculate total number of relevant species:
-summaries %>% filter(redlistCategory != "Extinct") %>% nrow() + 8427
-## Number doesn't include 8427 LC birds as they weren't downloaded
-## Once LC birds included: total is 36602
+summaries %>% filter(redlistCategory != "Extinct") %>% nrow()
+
 
 
 ## Merge threats, actions and all other fields for all: -------------------------####
 
 
 ## Threat data for birds, corals and fw shrimp already loaded, so only adding other spp:
-thr <- read.csv("data/rl_download_12_05_2020/all_other_spp/threats.csv", 
+thr <- read.csv("data/rl_download_29_03_2021/all_other_spp/threats.csv", 
                       na.string = c("", "NA"))
 thr <- filter(thr, scientificName %in% spp$scientificName)
 threats <- bind_rows(threats, thr) ## Add all other spp to birds etc (saved in threats)
 
 
 ## Action data:
-act <- read.csv("data/rl_download_12_05_2020/all_other_spp/conservation_needed.csv", 
+act <- read.csv("data/rl_download_29_03_2021/all_other_spp/conservation_needed.csv", 
                      na.string = c("", "NA"))
 act <- filter(act, scientificName %in% spp$scientificName)
 actions <- bind_rows(actions, act) ## Add all other spp to birds etc (saved in actions)
 
 
 # all_other_fields data:
-allo <- read.csv("data/rl_download_12_05_2020/all_other_spp/all_other_fields.csv", 
+allo <- read.csv("data/rl_download_29_03_2021/all_other_spp/all_other_fields.csv", 
                  na.string = c("", "NA"))
 allo <- filter(allo, scientificName %in% spp$scientificName)
 allother <- bind_rows(allother, allo) ## Add all other spp to birds etc (saved in allother)
 
 
+
+## Assessment data:
+as <- read.csv("data/rl_download_29_03_2021/all_other_spp/assessments.csv", 
+                na.string = c("", "NA"))
+as <- select(as, scientificName, threats)
+as <- filter(as, scientificName %in% spp$scientificName)
+assess <- bind_rows(assess, as) ## Add all other spp to birds etc (saved in assess)
+
+
+## Use and trade data:
+us <- read.csv("data/rl_download_29_03_2021/all_other_spp/usetrade.csv", 
+               na.string = c("", "NA"))
+us <- filter(us, scientificName %in% spp$scientificName)
+use <- bind_rows(use, us) ## Add all other spp to birds etc (saved in assess)
   
+summaries <- left_join(summaries, assess)
+
+write_csv(summaries, "data/all_summaries.csv")
+write_csv(threats, "data/all_threats.csv")
+write_csv(use, "data/all_usetrade.csv")
+
 ## Retain relevant RL categories and save files ---------------------------####
 summariesf <- summaries %>% 
   filter(redlistCategory %in% c("Extinct in the Wild", "Critically Endangered", "Endangered", 
                                 "Vulnerable")) %>% 
   unique()
+
+
 write_csv(summariesf, "data/simple_summaries.csv")
 
 threatsf <- threats %>% 
@@ -153,7 +186,9 @@ threats <- read.csv("data/threats.csv")
 stresses <- threats %>% 
   filter(timing %in% c("Future", "Ongoing")) %>% 
   select(scientificName, code, name, stressName) %>%
-  separate_rows(stressName, sep = "[|]") 
+  separate_rows(stressName, sep = "[|]") %>% 
+  filter(stressName != "Species Stresses" | is.na(stressName)) ##remove one species that is coded at level 1 
+  #in addition to level 2
 
 
 ## Convert level 3 stresses to level 2:
@@ -187,13 +222,13 @@ stresses <- left_join(stresses, thr_lev, by = "thr_lev2")
 
 ## Remove duplicate spp (due to removing lev 3 threats and stresses):
 stresses <- stresses %>% 
-  unique() %>% ## retains 34207 combinations
-  filter(!is.na(stressName)) ## retains 33415 combinations
-33415 / 34207 * 100 ## percentage of observations with threats AND stresses listed
-
+  unique() %>% ## retains 38176 combinations
+  filter(!is.na(stressName)) 
+37301 / 38176 * 100 ## percentage of observations with threats AND stresses listed
+write_csv(stresses, "data/threats_stresses.csv")
 
 ## Merge spp with target matching, and save file
-match <- read.csv("data/thr_str_tar_matched.csv") ##load file with manual target matching
+match <- read.csv("data/thr_str_tar_matched_updated.csv") ##load file with manual target matching
 match$thr_lev2 <- as.character(match$thr_lev2) ## turn numeric into character
 
 stresses <- left_join(stresses, match, by = c("thr_lev2", "stressName", "thr_lev2name"))
