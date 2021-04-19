@@ -19,6 +19,9 @@ nrow(tspp) / nrow(nspp) *100  ## calculate % of all spp that are threatened + EW
 nspp %>% count(className) ## count no in each class
 tspp %>% count(phylumName, className)
 
+
+
+
 ## ----------------------- Counts threats, targets, actions --------------------------------####
 
 
@@ -36,8 +39,8 @@ thr %>%
 thr_str <- read.csv("data/spp_tar.csv")
 thr_str %>% 
   select(scientificName, thr_lev1name) %>% 
-  filter(thr_lev1name != "Geological events") %>% #remove 163 spp with Geol events (no mitigation)
-  unique() %>% 
+  unique() %>%
+  filter(thr_lev1name != "Geological events") %>% #remove 108 spp with Geol events (no mitigation)
   count(thr_lev1name) %>% 
   mutate(perc1 = n / nrow(tspp) * 100) %>% ## calculate % of threatened/EW spp
   mutate(perc2 = n / nrow(nspp) * 100) %>% ## calculate % of all spp
@@ -90,7 +93,7 @@ thr_str %>%
 ggsave("figures/supp_target_figure.png", height = 4, width = 5, dpi = 300, unit = "cm")
 
 
-## Venn diagram and counts of spp requiring Target 3
+## Counts of spp requiring Target 3
 
 ## Filter all spp benefiting from target 3 (those for which threats not addressed by other targets):
 target3 <- thr_str %>% 
@@ -119,6 +122,13 @@ act %>%
   arrange(-n)
 
 
+## Spp benefiting from site/area protection and management:
+act %>% 
+  filter(name %in% c("Site/area protection", "Site/area management")) %>% 
+  select(scientificName) %>% 
+  unique() %>% 
+  nrow()
+
 act %>% 
   filter(name %in% c("Ex-situ conservation", "Species re-introduction", 
                      "Species recovery")) %>% 
@@ -126,29 +136,12 @@ act %>%
   unique() ->
   tar3actions
 
-tar3actions %>% filter(!scientificName %in% othertar$scientificName) %>% nrow()
 
-tar3actions$`Species that require\nrecovery actions`  <- TRUE
-
-target3$`Species that require\nthreat mitigation` <- TRUE
 
 tar3actions <- tar3actions %>% 
   full_join(target3) %>% 
   replace_na(list(`Species that require\nrecovery actions` = FALSE, 
                   `Species that require\nthreat mitigation` = FALSE))
-
-
-ggplot(tar3actions, aes(A = `Species that require\nrecovery actions`, 
-             B = `Species that require\nthreat mitigation`)) +
-  geom_venn(fill_color = c("#B4B8AB", "#153243"), 
-            fill_alpha = 0.6,
-            stroke_color = c("#B4B8AB", "#153243"), 
-            show_percentage = FALSE,
-            set_name_size = 2.5) + 
-  labs(title = "Species that require Target 3") +
-  theme_void() + 
-  coord_fixed()
-ggsave("figures/venndiagram.png")
 
 
 
@@ -300,7 +293,7 @@ summaries <- summaries %>%
 
 count(summaries, actions, other_threats)
 ## spp that need additional actions:
-1252 + 611 #1836
+1252 + 611 #1863
 ## spp that have threats not tackled:
 1252 + 2172 #3424
 ## total spp needing target 3, and %:
@@ -312,5 +305,23 @@ count(summaries, actions, other_threats)
 count(summaries, actions, other_threats, smallpop)
 
 write_csv(summaries, "data/target3_eligible.csv")
+
+summaries$actions <- recode(summaries$actions, yes = TRUE)
+summaries$other_threats <- recode(summaries$other_threats, yes = TRUE)
+
+summaries <- replace_na(summaries, list(actions = FALSE, other_threats = FALSE))
+
+
+ggplot(summaries, aes(A = actions, 
+                      B = other_threats)) +
+  geom_venn(fill_color = c("#B4B8AB", "#153243"), 
+            fill_alpha = 0.6,
+            stroke_color = c("#B4B8AB", "#153243"), 
+            show_percentage = FALSE,
+            set_name_size = 2.5) + 
+  labs(title = "Species that require Target 3") +
+  theme_void() + 
+  coord_fixed()
+ggsave("figures/venndiagram.png")
 
 
