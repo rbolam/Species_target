@@ -218,11 +218,11 @@ tar3 <- threats %>%
 
 ## Sort country level data
 
-folders <- list.files("data/rl_download_12_05_2020/") ## make list of files in folder
+folders <- list.files("data/rl_download_29_03_2021/") ## make list of files in folder
 countries <- data.frame()
 
 for(i in 1:length(folders)) {
-  countr <- read.csv(paste("data/rl_download_12_05_2020/", folders[i], "/countries.csv", 
+  countr <- read.csv(paste("data/rl_download_29_03_2021/", folders[i], "/countries.csv", 
                            sep = ""), na.string = c("", "NA"))
   countries <- bind_rows(countries, countr)
 }
@@ -239,14 +239,12 @@ countries <- countries %>%
   select(scientificName, name) %>% 
   unique()
 
-## Count spp per country + calc median:
-countries %>% filter(scientificName %in% tar3$scientificName) %>% unique() %>% count(name) %>% 
-  filter(n > 250) %>% arrange(-n)
-
 
 ## Match w full country list for map:
 countries <- full_join(countries, countriesmatch, by = "name") 
 
+
+## Count spp per country + calc median:
 
 countries %>% select(scientificName, region) %>% 
   filter(scientificName %in% tar3$scientificName) %>% unique() %>% count(region) %>% 
@@ -260,7 +258,7 @@ countries <- countries %>%
   unique() %>% 
   count(region)
 
-
+countries %>% filter(n > 300)
 
 ## Map
 
