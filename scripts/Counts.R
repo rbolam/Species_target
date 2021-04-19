@@ -17,7 +17,7 @@ tspp <- summaries %>%
 nrow(tspp) / nrow(nspp) *100  ## calculate % of all spp that are threatened + EW
 
 nspp %>% count(className) ## count no in each class
-tspp %>% count(phylumName, className)
+tspp %>% count(phylumName, className) %>% arrange(-n)
 
 
 
