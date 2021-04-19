@@ -4,7 +4,7 @@ library(tidyverse)
 library(lemon)
 
 actions <- read_csv("data/actions_needed.csv")
-summaries <- read_csv("data/simple_summaries.csv")
+summaries <- read_csv("data/all_summaries.csv")
 summaries <- select(summaries, scientificName, redlistCategory)
 
 actions <- left_join(actions, summaries, by = "scientificName")
@@ -26,7 +26,7 @@ actions %>%
   unique() %>% 
   ggplot(aes(x = fct_rev(fct_infreq(name)), fill = redlistCategory)) +
   geom_bar() +
-  coord_flip(ylim = c(0, 4100)) +
+  coord_flip() + #ylim = c(0, 4100)) +
   scale_fill_manual(values = c("#fecc5c", "#fd8d3c", "#e31a1c"), 
                     name = "IUCN Red List\nCategory") +
   scale_y_continuous(expand = c(0.001, 0), label = scales::comma) + 
