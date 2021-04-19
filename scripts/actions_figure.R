@@ -22,11 +22,11 @@ write_csv(actions, "data/actions_needed_tidy.csv")
 
 actions %>% 
   select(scientificName, name, redlistCategory) %>% 
-  filter(redlistCategory != "Extinct in the Wild") %>% ##exclude 15 EW spp as can't see them
-  unique() %>% 
+  filter(redlistCategory != "Extinct in the Wild") %>% ##exclude 13 EW spp as can't see them
+  unique() %>%
   ggplot(aes(x = fct_rev(fct_infreq(name)), fill = redlistCategory)) +
   geom_bar() +
-  coord_flip() + #ylim = c(0, 4100)) +
+  coord_flip(ylim = c(0, 4500)) +
   scale_fill_manual(values = c("#fecc5c", "#fd8d3c", "#e31a1c"), 
                     name = "IUCN Red List\nCategory") +
   scale_y_continuous(expand = c(0.001, 0), label = scales::comma) + 
