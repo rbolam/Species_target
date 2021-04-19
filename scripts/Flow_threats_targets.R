@@ -46,12 +46,13 @@ threats %>%
 
 
 ### Reorder factors depending on size of threat, or numerical order of Target
-threats_summ %>% group_by(thr_lev1name) %>% summarise(sum = sum(n)) %>% arrange(-sum)
+threats %>% select(scientificName, thr_lev1name) %>% unique() %>% 
+  count(thr_lev1name) %>% arrange(-n)
 threats_summ$thr_lev1name <- factor(threats_summ$thr_lev1name)
 levels(threats_summ$thr_lev1name)
 threats_summ$thr_lev1name <- 
   factor(threats_summ$thr_lev1name, 
-         levels(threats_summ$thr_lev1name)[c(3, 2, 9, 5, 6, 8, 4, 7, 1)])
+         levels(threats_summ$thr_lev1name)[c(3, 2, 9, 5, 6, 4, 8, 7, 1)])
 
 
 ## ---------------------------------------- Figure 1 ----------------------------------####
@@ -141,7 +142,7 @@ thr <- filter(thr, double > 0)
 ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
   geom_alluvium(aes(fill = thr_lev1name), alpha = 0.7, aes.bind = TRUE, width = 1/4) +
   geom_stratum(size = 0.5, colour = "white", width = 1/4, 
-               fill = c(NA, "white", NA, NA, rep("white", 5), rep("grey90", 4), "white", "white")
+               fill = c(NA, "white", "white", NA, rep("white", 5), rep("grey90", 4), "white", "white")
                ) +
   ## Polygons for threats:
   annotate("polygon", x = x, y = c(thr$ymin[1], thr$ymax[1], thr$y2[1], thr$y1[1]), 
@@ -155,42 +156,44 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
   annotate("polygon", x = x, y = c(thr$ymin[5], thr$ymax[5], thr$y2[5], thr$y1[5]), 
            fill = viridis(9, option = "E")[5], alpha = 0.7, colour = NA) +  
   annotate("polygon", x = x, y = c(thr$ymin[6], thr$ymax[6], thr$y2[6], thr$y1[6]), 
-           fill = viridis(9, option = "E")[8], alpha = 0.7, colour = NA) +  
+           fill = viridis(9, option = "E")[7], alpha = 0.7, colour = NA) +  
+  annotate("polygon", x = x, y = c(thr$ymin[7], thr$ymax[7], thr$y2[7], thr$y1[7]), 
+           fill = viridis(9, option = "E")[8], alpha = 0.7, colour = NA) + 
   
   # Rectangles for threats:  
   annotate("rect", xmin = 0.875, xmax = 1, ymin = thr$ymin, ymax = thr$ymax, 
-           fill = viridis(9, option = "E")[c(1:5,8)], alpha = 0.7, colour = NA) +
+           fill = viridis(9, option = "E")[c(1:5, 7, 8)], alpha = 0.7, colour = NA) +
   
   #Polygon/rectangle for targets 1 & 2:
-  annotate("polygon", x = c(1.878, 1.878, 2, 2), y = c(13345, 26863, 23133, 17075), 
+  annotate("polygon", x = c(1.878, 1.878, 2, 2), y = c(16878, 37459, 30851, 23486), 
            fill = "grey90", alpha = 0.9, colour = NA) +  
-  annotate("rect", xmin = 2, xmax = 2.125, ymin = 17075, ymax = 23133, 
+  annotate("rect", xmin = 2, xmax = 2.125, ymin = 23486, ymax = 30851, 
            fill = "grey90", alpha = 0.9, colour = NA) +
   
   #Polygon/rectangle for target 3:
-  annotate("polygon", x = c(1.878, 1.878, 2, 2), y = c(9102, 13345, 12660, 9787), 
+  annotate("polygon", x = c(1.878, 1.878, 2, 2), y = c(10259, 16878, 15586, 11551), 
            fill = "grey90", alpha = 0.9, colour = NA) +
-  annotate("rect", xmin = 2, xmax = 2.125, ymin = 9787, ymax = 12660, 
+  annotate("rect", xmin = 2, xmax = 2.125, ymin = 11551, ymax = 15586, 
            fill = "grey90", alpha = 0.9, colour = NA) +
   
   ## Add labels:
   geom_text(stat = "stratum", infer.label = FALSE, size = 2.5,  
             colour = "black" ,
-            label = c("Additional actions\nrequired (1,521)",
-                      "Other (2,055)", 
-                      "Climate change &\nsevere weather (1,339)",
-                      "Pollution (1,472)", 
-                      "Natural system\nmodifications (1,517)", 
-                      "Invasive & other\nproblematic species\n(1,926)", 
-                      "Residential &\ncommercial\ndevelopment (2,321)", 
-                      "Agriculture &\naquaculture (4,447)", 
-                      "Biological resource\nuse (4,596)", 
-                      "Target 7 - Climate\nchange (1,339)",
-                      "Target 6 - Pollution\n(1,472)",
-                      "Target 5 - Invasive\nspecies (1,695)", 
-                      "Target 4 - Harvesting\n& trade (4,596)", 
-                      "Target 3 - Manage\nspecies for recovery\n(2,707)",
-                      "Target 1 & 2 -\nEcosystems &\nprotected areas\n(6,058)")) +
+            label = c("Additional actions\nrequired (1,863)",
+                      "Other (3,028)", 
+                      "Pollution (1,621)", 
+                      "Climate change &\nsevere weather (1,658)",
+                      "Natural system\nmodifications (1,701)", 
+                      "Invasive & other\nproblematic species\n(2,258)", 
+                      "Residential &\ncommercial\ndevelopment (2,499)", 
+                      "Agriculture &\naquaculture (4,730)", 
+                      "Biological resource\nuse (4,981)", 
+                      "Target 7 - Climate\nchange (1,658)",
+                      "Target 6 - Pollution\n(1,621)",
+                      "Target 5 - Invasive\nspecies (1,999)", 
+                      "Target 4 - Harvesting\n& trade (4,981)", 
+                      "Target 3 - Manage\nspecies for recovery\n(3,424)",
+                      "Target 1 & 2 -\nEcosystems &\nprotected areas\n(7,365)")) +
   scale_x_discrete(limits = c("Threat", "Proposed targets"), name = "", expand = c(.001, 0)) + 
   scale_y_continuous(name = "Number of species", expand = c(0.001, 0), 
   label = scales::comma) + 
@@ -200,7 +203,7 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
         text = element_text(size = 11),
         axis.ticks.x = element_blank(),
         axis.text = element_text(colour = "black"))
-ggsave("figures/fig1.tiff", width = 6, height = 5.7, dpi = 300)
+ggsave("figures/fig1.tiff", width = 6, height = 6.5, dpi = 300)
 
 
 ## -------------------------------------- Map -----------------------------------####
@@ -279,5 +282,13 @@ ggplot() +
   theme(text = element_text(size = 9))
 
 ggsave("figures/fig2.tiff", width = 6, height = 3.1, dpi = 300)
+
+
+
+
+############## Supplementary map #######################################
+
+
+
 
 
