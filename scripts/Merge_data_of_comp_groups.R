@@ -191,6 +191,10 @@ stresses <- threats %>%
   #in addition to level 2
 
 
+## Percent of threats with stresses listed:
+count(stresses, stressName) #get NAs
+(nrow(stresses) - 1047) / nrow(stresses) * 100
+
 ## Convert level 3 stresses to level 2:
 stresses$stressName[stresses$stressName %in% c("Hybridisation", "Competition", 
                                                "Loss of mutualism", "Loss of pollinator", 
