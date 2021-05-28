@@ -76,6 +76,26 @@ thr_str %>%
   arrange(-n)
 
 
+## Percent/Count spp benefiting from target 3:
+thr_str %>% 
+  filter(thr_lev1name != "Geological events") %>% ## remove Geol events as can't be mitigated
+  filter(target == "Target 3") %>% 
+  select(scientificName) %>% 
+  unique() ->
+  tar3
+
+thr_str %>% 
+  filter(thr_lev1name != "Geological events") %>% ## remove Geol events as can't be mitigated
+  filter(scientificName %in% tar3$scientificName) %>% 
+  select(scientificName, target) %>% 
+  unique() %>% 
+  count(scientificName) %>% 
+  filter(n > 1) %>% 
+  #filter(n == 1) %>% 
+  nrow()
+  
+
+
 thr_str %>% 
   filter(thr_lev1name != "Geological events") %>% ## remove Geol events as can't be mitigated
   select(scientificName, target) %>% 
@@ -121,6 +141,10 @@ act %>%
   mutate(perc2 = n / nrow(nspp) * 100) %>% ## calculate % of all spp
   arrange(-n)
 
+## Spp with actions listed
+
+tspp %>% filter(scientificName %in% act$scientificName) %>% nrow()
+6692 / nrow(tspp) * 100
 
 ## Spp benefiting from site/area protection and management:
 act %>% 
@@ -335,3 +359,34 @@ ggplot(summaries, aes(A = `Species requiring\nrecovery actions`,
 ggsave("figures/venndiagram.png")
 
 
+vennl <- list(A = 1:1863, B= 612:4035)
+names(vennl) <- c("Species requiring\nrecovery actions",
+                  "Species affected by\nother threats")
+
+
+venn.diagram(vennl, 
+             fill = c("#B4B8AB", "#153243"), 
+             alpha = c(0.6, 0.6), 
+             cat.just=list(c(0.8, -8.5) , c(0.3, -10.5)),
+             "figures/venn_diagram.png")
+
+
+
+tar3 <- read.csv("data/target3_eligible.csv")
+threats <- read.csv("data/all_threats.csv")
+
+spptar <- read.csv("data/spp_tar.csv")
+
+
+spptar %>% 
+  filter(target == "Target 3") %>% 
+  select(scientificName) %>% 
+  unique() ->
+  tar3
+
+spptar %>% 
+  select(scientificName, target) %>% 
+  unique() ->
+  alltar
+alltar %>% filter(scientificName %in% spptar$scientificName) %>% count(scientificName) %>% 
+  filter(n == 1) %>% nrow()
