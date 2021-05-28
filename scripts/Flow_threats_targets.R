@@ -287,6 +287,82 @@ ggsave("figures/fig2.tiff", width = 6, height = 3.1, dpi = 300)
 ############## Supplementary map #######################################
 
 
+all <- read.csv("data/all_summaries.csv")
+
+## Sort country level data
+
+folders <- list.files("data/rl_download_29_03_2021/") ## make list of files in folder
+countries <- data.frame()
+
+for(i in 1:length(folders)) {
+  countr <- read.csv(paste("data/rl_download_29_03_2021/", folders[i], "/countries.csv", 
+                           sep = ""), na.string = c("", "NA"))
+  countries <- bind_rows(countries, countr)
+}
+
+
+countriesmatch <- read.csv("data/countrymatching.csv")
+
+## Retain relevant categories only:
+
+countries <- countries %>% 
+  filter(origin %in% c("Native", "Reintroduced")) %>% 
+  filter(presence %in% c("Extant", "Possibly Extant", "Presence Uncertain", 
+                         "Possibly Extinct")) %>% 
+  select(scientificName, name) %>% 
+  unique()
+
+
+## Match w full country list for map:
+countries <- full_join(countries, countriesmatch, by = "name") 
+
+
+## Count spp per country + calc median:
+
+countries %>% 
+  select(scientificName, region) %>% 
+  filter(scientificName %in% tar3$scientificName) %>% 
+  unique() %>% 
+  count(region) ->
+  percent
+
+countries %>% 
+  select(scientificName, region) %>% 
+  filter(scientificName %in% all$scientificName) %>% 
+  unique() %>% 
+  count(region) %>% 
+  rename(allspp = n) ->
+  percent2
+
+percent <- percent %>% 
+  full_join(percent2) %>% 
+  mutate(perc = n / allspp * 100) %>% 
+  filter(!is.na(region))
+
+
+## Map
+
+
+map.all <- map_data(map = "world")
+map.all <- full_join(map.all, percent, by = "region") 
+
+map.all %>% select(region, n) %>%  unique() %>% filter(is.na(n))
+
+
+ggplot() + 
+  geom_map(data = map.all, map = map.all, 
+           aes(map_id = region, x = long, y = lat, fill = perc), colour = "black", size = 0.3) + 
+  scale_fill_distiller(palette = "BuPu", 
+                       direction = 1, 
+                       name = "Percent of\nall species\nrequiring\ntarget 3",
+                       values = c(0, 0.3, 1)) +
+  coord_proj("+proj=cea +lat_ts=37.5") +
+  labs(tag = "", x = "", y = "") + 
+  theme_void() +
+  theme(text = element_text(size = 9))
+
+ggsave("figures/suppmap.tiff", width = 6, height = 3.1, dpi = 300)
+
 
 
 
