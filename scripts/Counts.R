@@ -356,8 +356,9 @@ ggplot(summaries, aes(A = `Species requiring\nrecovery actions`,
   labs(title = "Species that require Target 3") +
   theme_void() + 
   coord_fixed()
-ggsave("figures/venndiagram.png")
 
+
+library(VennDiagram)
 
 vennl <- list(A = 1:1863, B= 612:4035)
 names(vennl) <- c("Species requiring\nrecovery actions",
@@ -370,23 +371,3 @@ venn.diagram(vennl,
              cat.just=list(c(0.8, -8.5) , c(0.3, -10.5)),
              "figures/venn_diagram.png")
 
-
-
-tar3 <- read.csv("data/target3_eligible.csv")
-threats <- read.csv("data/all_threats.csv")
-
-spptar <- read.csv("data/spp_tar.csv")
-
-
-spptar %>% 
-  filter(target == "Target 3") %>% 
-  select(scientificName) %>% 
-  unique() ->
-  tar3
-
-spptar %>% 
-  select(scientificName, target) %>% 
-  unique() ->
-  alltar
-alltar %>% filter(scientificName %in% spptar$scientificName) %>% count(scientificName) %>% 
-  filter(n == 1) %>% nrow()
