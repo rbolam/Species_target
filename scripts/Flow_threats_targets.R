@@ -177,22 +177,22 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
            fill = "grey90", alpha = 0.9, colour = NA) +
   
   ## Add labels:
-  geom_text(stat = "stratum", infer.label = FALSE, size = 2.5,  
+  geom_text(stat = "stratum", infer.label = FALSE, size = 3, lineheight = 0.8, 
             colour = "black" ,
             label = c("Additional actions\nrequired (1,863)",
                       "Other (3,028)", 
                       "Pollution (1,621)", 
-                      "Climate change &\nsevere weather (1,658)",
-                      "Natural system\nmodifications (1,701)", 
-                      "Invasive & other\nproblematic species\n(2,258)", 
-                      "Residential &\ncommercial\ndevelopment (2,499)", 
-                      "Agriculture &\naquaculture (4,730)", 
+                      "Climate change &\nsevere weather\n(1,658)",
+                      "Natural system\nmodification (1,701)", 
+                      "Invasive & other\nproblematic\nspecies (2,258)", 
+                      "Residential &\ncommercial\ndevelopment\n(2,499)", 
+                      "Agriculture &\naquaculture\n(4,730)",
                       "Biological resource\nuse (4,981)", 
                       "Target 7 - Climate\nchange (1,658)",
                       "Target 6 - Pollution\n(1,621)",
                       "Target 5 - Invasive\nspecies (1,999)", 
-                      "Target 4 - Harvesting\n& trade (4,981)", 
-                      "Target 3 - Manage\nspecies for recovery\n(3,424)",
+                      "Target 4 -\nHarvesting \ntrade (4,981)", 
+                      "Target 3 - Manage\nspecies for\nrecovery (3,424)",
                       "Target 1 & 2 -\nEcosystems &\nprotected areas\n(7,365)")) +
   scale_x_discrete(limits = c("Threat", "Proposed targets"), name = "", expand = c(.001, 0)) + 
   scale_y_continuous(name = "Number of species", expand = c(0.001, 0), 
