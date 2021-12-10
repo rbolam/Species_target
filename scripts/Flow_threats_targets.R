@@ -272,7 +272,7 @@ map.all %>% select(region, n) %>%  unique() %>% filter(is.na(n))
 ggplot() + 
   geom_map(data = map.all, map = map.all, 
            aes(map_id = region, x = long, y = lat, fill = n), colour = "black", size = 0.3) + 
-  scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "Species\nrequiring\ntarget 3") +
+  scale_fill_distiller(palette = "YlOrRd", direction = 1, name = "Species\nrequiring\nTarget 4") +
   coord_proj("+proj=cea +lat_ts=37.5") +
   labs(tag = "", x = "", y = "") + 
   guides(colour = "none") +
