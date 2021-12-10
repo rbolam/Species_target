@@ -354,7 +354,7 @@ ggplot() +
            aes(map_id = region, x = long, y = lat, fill = perc), colour = "black", size = 0.3) + 
   scale_fill_distiller(palette = "BuPu", 
                        direction = 1, 
-                       name = "Percent of\nall species\nrequiring\ntarget 3",
+                       name = "Percent of\nall species\nrequiring\nTarget 4",
                        values = c(0, 0.3, 1)) +
   coord_proj("+proj=cea +lat_ts=37.5") +
   labs(tag = "", x = "", y = "") + 
