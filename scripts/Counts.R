@@ -339,35 +339,45 @@ summaries <- read.csv("data/target3_eligible.csv")
 
 summaries$actions <- recode(summaries$actions, yes = TRUE)
 summaries$other_threats <- recode(summaries$other_threats, yes = TRUE)
+summaries$smallpop <- recode(summaries$smallpop, yes = TRUE)
 
-summaries <- replace_na(summaries, list(actions = FALSE, other_threats = FALSE))
+summaries <- replace_na(summaries, list(actions = FALSE, other_threats = FALSE, 
+                                        smallpop = FALSE))
 
-summaries <-rename(summaries, `Species requiring\nrecovery actions` = actions,
-                   `Species affected by\nother threats` = other_threats)
+summaries <-rename(summaries, 
+                   `Species requiring\nrecovery actions` = actions,
+                   `Species affected by\nother threats` = other_threats,
+                   `Species with small\npopulation sizes` = smallpop)
 
 
 ggplot(summaries, aes(A = `Species requiring\nrecovery actions`, 
-                      B = `Species affected by\nother threats`)) +
-  geom_venn(fill_color = c("#B4B8AB", "#153243"), 
-            fill_alpha = 0.6,
-            stroke_color = c("#B4B8AB", "#153243"), 
+                      B = `Species affected by\nother threats`,
+                      C = `Species with small\npopulation sizes`)) +
+  geom_venn(fill_color = c("#8c96c6", "#810f7c", "#edf8fb"), 
+            fill_alpha = 0.8,
+            stroke_color = c("#8c96c6", "#810f7c", "#edf8fb"), 
             show_percentage = FALSE,
             set_name_size = 2.5) + 
-  labs(title = "Species that require Target 3") +
+  labs(title = "Species that require Target 4") +
   theme_void() + 
   coord_fixed()
-
+ggsave("figures/venn_diagram.png", width = 6, height = 3.1, dpi = 300)
 
 library(VennDiagram)
 
-vennl <- list(A = 1:1863, B= 612:4035)
+vennl <- list(A = 1:1863, B = 612:3135, C = c(485:908, 2846:3528))
 names(vennl) <- c("Species requiring\nrecovery actions",
-                  "Species affected by\nother threats")
+                  "Species affected by\nother threats",
+                  "Species with small\npopulation sizes")
 
 
 venn.diagram(vennl, 
-             fill = c("#B4B8AB", "#153243"), 
-             alpha = c(0.6, 0.6), 
-             cat.just=list(c(0.8, -8.5) , c(0.3, -10.5)),
-             "figures/venn_diagram.png")
+             #fill = c("#B4B8AB", "#153243"), 
+             alpha = c(0.6, 0.6, 0.6), 
+             #cat.just=list(c(0.8, -8.5) , c(0.3, -10.5)),
+             "figures/venn_diagram2.png")
+
+overrideTriple=T
+draw.triple.venn(9, 20, 30, 2, 10, 3, 2, category =
+                   rep("", 3), rotation = 1, reverse = FALSE, euler.d = F, scaled = F)
 
