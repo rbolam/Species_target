@@ -188,20 +188,21 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
                       "Residential &\ncommercial\ndevelopment\n(2,499)", 
                       "Agriculture &\naquaculture\n(4,730)",
                       "Biological resource\nuse (4,981)", 
-                      "Target 7 - Climate\nchange (1,658)",
-                      "Target 6 - Pollution\n(1,621)",
-                      "Target 5 - Invasive\nspecies (1,999)", 
-                      "Target 4 -\nHarvesting \ntrade (4,981)", 
-                      "Target 3 - Manage\nspecies for\nrecovery (3,424)",
-                      "Target 1 & 2 -\nEcosystems &\nprotected areas\n(7,365)")) +
-  scale_x_discrete(limits = c("Threat", "Proposed targets"), name = "", expand = c(.001, 0)) + 
-  scale_y_continuous(name = "Number of species", expand = c(0.001, 0), 
+                      "Target 8 - Climate\nchange (1,658)",
+                      "Target 7 - Pollution\n(1,621)",
+                      "Target 6 - Invasive\nalien species (1,999)", 
+                      "Target 5 -\nHarvesting, trade\n& use (4,981)", 
+                      "Target 4 - Manage\nspecies for\nrecovery (3,424)",
+                      "Target 1 - 3 - Spatial\nplanning, restoration\n& protected areas\n(7,365)")) +
+  scale_x_discrete(limits = c("Threats", "Proposed Targets"), name = "", expand = c(.001, 0)) + 
+  scale_y_continuous(name = "", expand = c(0.001, 0), 
   label = scales::comma) + 
   scale_fill_viridis_d(option = "E", direction = 1) +
   theme_classic() +
   theme(legend.position = "none",
         text = element_text(size = 11),
-        axis.ticks.x = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text.y = element_blank(),
         axis.text = element_text(colour = "black"))
 ggsave("figures/fig1.tiff", width = 6, height = 6.5, dpi = 300)
 
