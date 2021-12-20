@@ -178,7 +178,7 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
   
   ## Add labels:
   geom_text(stat = "stratum", infer.label = FALSE, size = 3, lineheight = 0.8, 
-            colour = "black" ,
+            colour = c("#2171b5", rep("black", 14)),
             label = c("Additional actions\nrequired (1,863)",
                       "Other (3,028)", 
                       "Pollution (1,621)", 
@@ -192,7 +192,7 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
                       "Target 7 - Pollution\n(1,621)",
                       "Target 6 - Invasive\nalien species (1,999)", 
                       "Target 5 -\nHarvesting, trade\n& use (4,981)", 
-                      "Target 4 - Manage\nspecies for\nrecovery (3,424)",
+                      "Target 4 - Manage\nspecies for\nrecovery (4,035)",
                       "Target 1 - 3 - Spatial\nplanning, restoration\n& protected areas\n(7,365)")) +
   scale_x_discrete(limits = c("Threats", "Proposed Targets"), name = "", expand = c(.001, 0)) + 
   scale_y_continuous(name = "", expand = c(0.001, 0), 
