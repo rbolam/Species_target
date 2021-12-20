@@ -345,20 +345,19 @@ summaries <- replace_na(summaries, list(actions = FALSE, other_threats = FALSE,
                                         smallpop = FALSE))
 
 summaries <-rename(summaries, 
-                   `Species requiring\nrecovery actions` = actions,
-                   `Species affected by\nother threats` = other_threats,
-                   `Species with small\npopulation sizes` = smallpop)
+                   `a) Species requiring\nrecovery actions` = actions,
+                   `b) Species affected by\nother threats` = other_threats,
+                   `c) Species with very small\npopulation sizes or ranges` = smallpop)
 
 
-ggplot(summaries, aes(A = `Species requiring\nrecovery actions`, 
-                      B = `Species affected by\nother threats`,
-                      C = `Species with small\npopulation sizes`)) +
+ggplot(summaries, aes(A = `a) Species requiring\nrecovery actions`, 
+                      B = `b) Species affected by\nother threats`,
+                      C = `c) Species with very small\npopulation sizes or ranges`)) +
   geom_venn(fill_color = c("#8c96c6", "#810f7c", "#edf8fb"), 
             fill_alpha = 0.8,
             stroke_color = c("#8c96c6", "#810f7c", "#edf8fb"), 
             show_percentage = FALSE,
             set_name_size = 2.5) + 
-  labs(title = "Species that require Target 4") +
   theme_void() + 
   coord_fixed()
 ggsave("figures/venn_diagram.png", width = 6, height = 3.1, dpi = 300)
