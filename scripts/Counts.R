@@ -380,3 +380,56 @@ overrideTriple=T
 draw.triple.venn(9, 20, 30, 2, 10, 3, 2, category =
                    rep("", 3), rotation = 1, reverse = FALSE, euler.d = F, scaled = F)
 
+
+
+## New supplementary figures
+threats <- read.csv("data/spp_tar.csv")
+target3 <- read.csv("data/target3_eligible.csv")
+target3 <- target3 %>% 
+  filter(actions == "yes" | smallpop == "yes") %>% 
+  select(scientificName)
+target3$target <- "Target 3"
+target3$thr_lev1name <- "Additional actions required"
+
+threats <- bind_rows(threats, target3)
+
+
+threats %>% 
+  select(scientificName, thr_lev1, thr_lev1name) %>% 
+  unique() %>% 
+  count(scientificName) %>% 
+  ggplot(aes(x = n)) +
+  geom_histogram() +
+  labs(x = "Number of threats",
+       y = "Number of species")
+ggsave("figures/WebFigure3.png", width = 6, height = 3.1, dpi = 300)
+
+
+threats %>% 
+  select(scientificName, thr_lev1, thr_lev1name) %>% 
+  unique() %>% 
+  count(scientificName) %>% 
+  filter(n == 1) ->
+  spp_one_threat
+
+
+threats %>% 
+  filter(scientificName %in% spp_one_threat$scientificName) %>% 
+  count(thr_lev1, thr_lev1name) %>% 
+  filter(!is.na(thr_lev1)) %>% 
+  ggplot(aes(x = n, y = fct_reorder(thr_lev1name, n))) +
+  geom_col() +
+  labs(x = "Number of species",
+       y = "Threat")
+ggsave("figures/WebFigure4.png", width = 6, height = 3.1, dpi = 300)
+
+
+threats %>% 
+  select(scientificName, target) %>% 
+  unique() %>% 
+  count(scientificName) %>% 
+  ggplot(aes(x = n)) +
+  geom_histogram() +
+  labs(x = "Number of targets required",
+       y = "Number of species")
+ggsave("figures/WebFigure5.png", width = 6, height = 3.1, dpi = 300)
