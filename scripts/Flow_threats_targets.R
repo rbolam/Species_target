@@ -12,7 +12,7 @@ library(cowplot)
 threats <- read.csv("data/spp_tar.csv")
 target3 <- read.csv("data/target3_eligible.csv")
 target3 <- target3 %>% 
-  filter(actions == "yes" | smallpop == "yes") %>% 
+  filter(actions == "yes" | other_threats == "yes" | smallpop == "yes") %>% 
   select(scientificName)
 target3$target <- "Target 3"
 target3$thr_lev1name <- "Additional actions required"
@@ -164,16 +164,16 @@ ggplot(threats_summ, aes(axis1 = thr_lev1name, axis2 = target, y = n)) +
   annotate("rect", xmin = 0.875, xmax = 1, ymin = thr$ymin, ymax = thr$ymax, 
            fill = viridis(9, option = "E")[c(1:5, 7, 8)], alpha = 0.7, colour = NA) +
   
-  #Polygon/rectangle for targets 1 & 2:
-  annotate("polygon", x = c(1.878, 1.878, 2, 2), y = c(16878, 37459, 30851, 23486), 
+  #Polygon/rectangle for targets 1 - 3:
+  annotate("polygon", x = c(1.878, 1.878, 2, 2), y = c(19443, 40024, 33416, 26051), 
            fill = "grey90", alpha = 0.9, colour = NA) +  
-  annotate("rect", xmin = 2, xmax = 2.125, ymin = 23486, ymax = 30851, 
+  annotate("rect", xmin = 2, xmax = 2.125, ymin = 26051, ymax = 33416, 
            fill = "grey90", alpha = 0.9, colour = NA) +
   
-  #Polygon/rectangle for target 3:
-  annotate("polygon", x = c(1.878, 1.878, 2, 2), y = c(10259, 16878, 15586, 11551), 
+  #Polygon/rectangle for target 4:
+  annotate("polygon", x = c(1.878, 1.878, 2, 2), y = c(10259, 19443, 19279, 10423), 
            fill = "grey90", alpha = 0.9, colour = NA) +
-  annotate("rect", xmin = 2, xmax = 2.125, ymin = 11551, ymax = 15586, 
+  annotate("rect", xmin = 2, xmax = 2.125, ymin = 10423, ymax = 19279, 
            fill = "grey90", alpha = 0.9, colour = NA) +
   
   ## Add labels:
@@ -283,6 +283,12 @@ ggplot() +
 ggsave("figures/fig2.tiff", width = 6, height = 3.1, dpi = 300)
 
 
+map.all %>% 
+  select(region, n) %>% 
+  unique() %>% 
+  #summary()
+  filter(n > 400) %>% 
+  arrange(n)
 
 
 ############## Supplementary map #######################################
@@ -364,6 +370,11 @@ ggplot() +
 
 ggsave("figures/suppmap.tiff", width = 6, height = 3.1, dpi = 300)
 
-
+map.all %>% 
+  select(region, perc) %>% 
+  unique() %>% 
+  #summary()
+  filter(perc > 19) %>% 
+  arrange(perc)
 
 
