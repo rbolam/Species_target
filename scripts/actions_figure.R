@@ -34,7 +34,7 @@ actions %>%
   scale_y_continuous(expand = c(0.001, 0), label = scales::comma) + 
   theme_classic() +
   guides(fill = guide_legend(reverse = TRUE)) +
-  labs(x = "Recovery actions needed", y = "Number of species") +
+  labs(x = "Conservation actions needed", y = "Number of species") +
   theme(legend.position = c(0.8, 0.3),
         text = element_text(size = 9),
         axis.text = element_text(colour = "black"))
