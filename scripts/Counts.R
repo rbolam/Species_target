@@ -345,13 +345,13 @@ summaries <- replace_na(summaries, list(actions = FALSE, other_threats = FALSE,
                                         smallpop = FALSE))
 
 summaries <-rename(summaries, 
-                   `a) Species requiring\nrecovery actions` = actions,
-                   `b) Species affected by threats\nnot addressed by other targets` = other_threats,
+                   `b) Species requiring\nrecovery actions` = actions,
+                   `a) Species affected by threats\nnot addressed by other targets` = other_threats,
                    `c) Species with very small\npopulation sizes or ranges` = smallpop)
 
 
-ggplot(summaries, aes(A = `a) Species requiring\nrecovery actions`, 
-                      B = `b) Species affected by threats\nnot addressed by other targets`,
+ggplot(summaries, aes(A = `a) Species affected by threats\nnot addressed by other targets`,
+                      B = `b) Species requiring\nrecovery actions`, 
                       C = `c) Species with very small\npopulation sizes or ranges`)) +
   geom_venn(fill_color = c("#8c96c6", "#810f7c", "#edf8fb"), 
             fill_alpha = 0.8,
