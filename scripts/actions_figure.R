@@ -40,5 +40,5 @@ actions %>%
         axis.text = element_text(colour = "black"))
 
 ggsave("figures/fig3.tiff", height = 4, width = 6, dpi = 300)
-
+  
 
