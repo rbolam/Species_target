@@ -31,7 +31,7 @@ actions %>%
   coord_flip(ylim = c(0, 4500)) +
   scale_fill_manual(values = c("#fecc5c", "#fd8d3c", "#e31a1c"), 
                     name = "IUCN Red List\nCategory") +
-  scale_y_continuous(expand = c(0.001, 0), label = scales::comma) + 
+  scale_y_continuous(expand = c(0.001, 0)) +
   theme_classic() +
   guides(fill = guide_legend(reverse = TRUE)) +
   labs(x = "Conservation actions needed", y = "Number of species") +
